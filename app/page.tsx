@@ -219,13 +219,14 @@ export default function Home() {
   }
   
   // RESULTS SCREEN
-  if (screen === 'results' && studio.currentProject && studio.currentProject.results) {
+  if (screen === 'results' && studio.currentProject?.results) {
+    const currentProject = studio.currentProject;
     return (
       <ResultsScreen
-        project={studio.currentProject}
+        project={currentProject}
         onContinue={() => {
           // Free up talent
-          const freedTalent = studio.currentProject!.assignedTalent;
+          const freedTalent = currentProject.assignedTalent;
           updateStudio({
             talentPool: studio.talentPool.map(t =>
               freedTalent.find(f => f.id === t.id) ? { ...t, busy: false, stats: { ...t.stats, energy: 100 } } : t

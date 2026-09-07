@@ -1,7 +1,7 @@
 // Core game logic and calculations
 
 import { 
-  Studio, Project, ScenePanel, StoryOutcome, EditChoice, Talent, Genre 
+  Studio, Project, ScenePanel, StoryOutcome, EditChoice, Talent, Genre, ProjectResults 
 } from './types';
 import { calculateChemistry } from './game-data';
 
@@ -167,7 +167,7 @@ export function calculateEditingImpact(choices: EditChoice, storyOutcome: StoryO
 export function calculateProjectResults(
   project: Project,
   studio: Studio
-): Project['results'] {
+): ProjectResults {
   if (!project.storyOutcome || !project.editChoices) {
     throw new Error('Project not ready for results calculation');
   }

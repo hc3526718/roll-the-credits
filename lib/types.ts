@@ -76,6 +76,14 @@ export interface EditChoice {
   thumbnailStyle: 'artistic' | 'dramatic' | 'clickbait';
 }
 
+export interface ProjectResults {
+  audienceScore: number; // 0-100
+  criticScore: number; // 0-100
+  revenue: number;
+  followersGained: number;
+  reputationChange: number;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -95,13 +103,7 @@ export interface Project {
   
   editChoices?: EditChoice;
   
-  results?: {
-    audienceScore: number; // 0-100
-    criticScore: number; // 0-100
-    revenue: number;
-    followersGained: number;
-    reputationChange: number;
-  };
+  results?: ProjectResults;
   
   createdAt: number;
   releasedAt?: number;
