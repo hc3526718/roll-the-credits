@@ -7,11 +7,13 @@ interface HiringPhaseProps {
   studio: Studio;
   budget: number;
   currentlyHired?: Talent[];
+  requiredRoles?: TalentRole[];
+  stageName?: string;
   onConfirm: (hired: Talent[]) => void;
   onBack: () => void;
 }
 
-export default function HiringPhase({ studio, budget, currentlyHired = [], onConfirm, onBack }: HiringPhaseProps) {
+export default function HiringPhase({ studio, budget, currentlyHired = [], requiredRoles = [], stageName = 'Hiring', onConfirm, onBack }: HiringPhaseProps) {
   const [selected, setSelected] = useState<Set<string>>(
     new Set(currentlyHired.map(t => t.id))
   );
@@ -47,9 +49,11 @@ export default function HiringPhase({ studio, budget, currentlyHired = [], onCon
     setSelected(newSelected);
   };
   
-  const hasDirector = selectedTalent.some(t => t.role === 'Director');
-  const hasMinActors = selectedTalent.filter(t => t.role === 'Actor').length >= 2;
-  const canProceed = hasDirector && hasMinActors && canAfford;
+  // Check requirements
+  const meetsRequirements = requiredRoles.length === 0 || requiredRoles.every(role => 
+    selectedTalent.some(t => t.role === role)
+  );
+  const canProceed = meetsRequirements && canAfford;
   
   return (
     <div className="min-h-screen bg-slate-900 text-white p-8">
@@ -64,7 +68,7 @@ export default function HiringPhase({ studio, budget, currentlyHired = [], onCon
         </div>
         
         <div className="bg-slate-800 rounded-lg p-8 pixel-border">
-          <h1 className="text-3xl font-bold mb-6 text-purple-300 pixel-text">HIRE TALENT</h1>
+          <h1 className="text-3xl font-bold mb-6 text-purple-300 pixel-text">HIRE TALENT - {stageName.toUpperCase()}</h1>
           
           {/* Budget Display */}
           <div className="mb-6 p-4 bg-slate-700 rounded-lg flex justify-between items-center">
@@ -81,17 +85,21 @@ export default function HiringPhase({ studio, budget, currentlyHired = [], onCon
           </div>
           
           {/* Requirements */}
-          <div className="mb-6 p-4 bg-slate-700/50 rounded-lg">
-            <p className="text-sm text-slate-400 mb-2">Requirements:</p>
-            <div className="flex gap-4 text-sm">
-              <span className={hasDirector ? 'text-green-400' : 'text-slate-400'}>
-                {hasDirector ? '✓' : '○'} 1+ Director
-              </span>
-              <span className={hasMinActors ? 'text-green-400' : 'text-slate-400'}>
-                {hasMinActors ? '✓' : '○'} 2+ Actors
-              </span>
+          {requiredRoles.length > 0 && (
+            <div className="mb-6 p-4 bg-slate-700/50 rounded-lg">
+              <p className="text-sm text-slate-400 mb-2">Required for this stage:</p>
+              <div className="flex flex-wrap gap-4 text-sm">
+                {requiredRoles.map(role => {
+                  const hasRole = selectedTalent.some(t => t.role === role);
+                  return (
+                    <span key={role} className={hasRole ? 'text-green-400' : 'text-slate-400'}>
+                      {hasRole ? '✓' : '○'} {role}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
           
           {/* Talent List */}
           <div className="grid grid-cols-2 gap-4 mb-6 max-h-[500px] overflow-y-auto">
@@ -167,8 +175,7 @@ export default function HiringPhase({ studio, budget, currentlyHired = [], onCon
           
           {!canProceed && (
             <p className="mt-4 text-center text-sm text-slate-400">
-              {!hasDirector && 'Need at least 1 Director. '}
-              {!hasMinActors && 'Need at least 2 Actors. '}
+              {!meetsRequirements && requiredRoles.length > 0 && `Need: ${requiredRoles.join(', ')}. `}
               {!canAfford && 'Over budget!'}
             </p>
           )}

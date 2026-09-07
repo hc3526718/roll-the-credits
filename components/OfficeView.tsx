@@ -18,7 +18,10 @@ export default function OfficeView({ studio, onNewProject, onContinueProject }: 
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <div>
             <h1 className="text-2xl font-bold text-purple-300 pixel-text">{studio.name}</h1>
-            <p className="text-sm text-slate-400">{studio.officeTier.toUpperCase()} OFFICE</p>
+            <div className="flex items-center gap-3 mt-1">
+              <p className="text-sm text-slate-400">{studio.officeTier.toUpperCase()} OFFICE</p>
+              <span className="text-xs px-2 py-0.5 bg-purple-600 rounded font-bold">LEVEL {studio.level}</span>
+            </div>
           </div>
           
           <div className="flex gap-8 text-sm">
@@ -40,6 +43,24 @@ export default function OfficeView({ studio, onNewProject, onContinueProject }: 
       
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-8">
+        {/* Active Events */}
+        {studio.activeEvents && studio.activeEvents.length > 0 && (
+          <div className="mb-8 bg-gradient-to-r from-orange-900/30 to-red-900/30 border-2 border-orange-600 rounded-lg p-4">
+            <h2 className="text-lg font-bold text-orange-300 mb-3">🔔 ACTIVE INDUSTRY EVENTS</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {studio.activeEvents.map(event => (
+                <div key={event.id} className="bg-slate-800/50 rounded p-3">
+                  <p className="font-bold text-sm text-orange-200">{event.name}</p>
+                  <p className="text-xs text-slate-400 mt-1">{event.description}</p>
+                  <p className="text-xs text-orange-400 mt-2">
+                    {Math.ceil((event.startDay + event.duration - studio.daysPassed) / 7)} weeks remaining
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         <div className="grid grid-cols-3 gap-8">
           {/* Office Visualization */}
           <div className="col-span-2 bg-slate-800 rounded-lg p-6 pixel-border">
@@ -54,9 +75,31 @@ export default function OfficeView({ studio, onNewProject, onContinueProject }: 
             </div>
           </div>
           
-          {/* Trends Panel */}
+          {/* Unlocks & Trends Panel */}
           <div className="bg-slate-800 rounded-lg p-6 pixel-border">
-            <h2 className="text-xl font-bold mb-4 text-purple-300">TRENDING NOW</h2>
+            <h2 className="text-xl font-bold mb-4 text-purple-300">STUDIO STATUS</h2>
+            
+            {/* Unlock Status */}
+            <div className="mb-6 p-3 bg-slate-700 rounded">
+              <p className="text-sm font-bold text-purple-300 mb-2">Available Roles ({studio.unlocks.availableRoles.length}/9)</p>
+              <div className="flex flex-wrap gap-1">
+                {studio.unlocks.availableRoles.map(role => (
+                  <span key={role} className="text-xs px-2 py-0.5 bg-purple-600 rounded">
+                    {role === 'Actor' && '🎭'}
+                    {role === 'Director' && '🎬'}
+                    {role === 'Writer' && '✍️'}
+                    {role === 'Cinematographer' && '📷'}
+                    {role === 'Editor' && '✂️'}
+                    {role === 'Sound Designer' && '🔊'}
+                    {role === 'VFX Artist' && '✨'}
+                    {role === 'Composer' && '🎵'}
+                    {role === 'Producer' && '📋'}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            <h3 className="text-lg font-bold mb-3 text-purple-300">TRENDING NOW</h3>
             <div className="space-y-3">
               {studio.trends.map(trend => (
                 <div key={trend.id} className="bg-slate-700 rounded p-3">
@@ -83,7 +126,7 @@ export default function OfficeView({ studio, onNewProject, onContinueProject }: 
         <div className="mt-8 bg-slate-800 rounded-lg p-6 pixel-border">
           <h2 className="text-xl font-bold mb-4 text-purple-300">PROJECT STATUS</h2>
           
-          {project ? (
+            {project ? (
             <div>
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -96,15 +139,18 @@ export default function OfficeView({ studio, onNewProject, onContinueProject }: 
                 </div>
               </div>
               
-              {project.phase === 'production' && (
+              {project.stageProgress && (
                 <div className="mb-4">
                   <div className="w-full bg-slate-700 rounded-full h-4">
                     <div 
                       className="bg-green-500 h-4 rounded-full transition-all"
-                      style={{ width: `${project.productionProgress}%` }}
+                      style={{ width: `${project.stageProgress.progress}%` }}
                     />
                   </div>
-                  <p className="text-sm text-slate-400 mt-2">Production: {project.productionProgress}%</p>
+                  <p className="text-sm text-slate-400 mt-2">
+                    {project.stageProgress.stage}: {Math.floor(project.stageProgress.progress)}% 
+                    ({project.weeksElapsed} weeks total)
+                  </p>
                 </div>
               )}
               

@@ -7,18 +7,22 @@ import OfficeView from '@/components/OfficeView';
 import ConceptPhase from '@/components/ConceptPhase';
 import HiringPhase from '@/components/HiringPhase';
 import ScenePlanner from '@/components/ScenePlanner';
-import ProductionPhase from '@/components/ProductionPhase';
+import StageScreen from '@/components/StageScreen';
+import DecisionModal from '@/components/DecisionModal';
 import EditingPhase from '@/components/EditingPhase';
 import ResultsScreen from '@/components/ResultsScreen';
-import { Project, Talent, ScenePanel, EditChoice } from '@/lib/types';
-import { calculateBudget, analyzeSceneQuality, calculateProjectResults, updateTrends } from '@/lib/game-logic';
+import { Project, Talent, ScenePanel, EditChoice, StageDecision, ProductionPhase, TalentRole } from '@/lib/types';
+import { calculateBudget, analyzeSceneQuality, calculateProjectResults, updateTrends, calculateRoleContribution } from '@/lib/game-logic';
+import { updateActiveEvents } from '@/lib/industry-events';
+import { calculateStudioLevel, getUnlocksForLevel } from '@/lib/progression';
 
-type GameScreen = 'start' | 'office' | 'concept' | 'hiring' | 'scene-planning' | 'production' | 'editing' | 'results';
+type GameScreen = 'start' | 'office' | 'concept' | 'stage' | 'hiring' | 'scene-planning' | 'editing' | 'results';
 
 export default function Home() {
-  const { state, initializeGame, loadGame, updateStudio, setCurrentProject, updateProject, completeProject } = useGame();
+  const { state, initializeGame, loadGame, updateStudio, setCurrentProject, updateProject, completeProject, saveGame } = useGame();
   const [screen, setScreen] = useState<GameScreen>('start');
-  const [projectDraft, setProjectDraft] = useState<Partial<Project>>({});
+  const [currentDecision, setCurrentDecision] = useState<StageDecision | null>(null);
+  const [hiringFor, setHiringFor] = useState<ProductionPhase>('planning');
   
   if (!state.initialized && screen !== 'start') {
     return (
@@ -60,6 +64,13 @@ export default function Home() {
   
   const studio = state.studio;
   
+  // Update studio level and unlocks
+  const currentLevel = calculateStudioLevel(studio);
+  if (currentLevel !== studio.level) {
+    const newUnlocks = getUnlocksForLevel(currentLevel, studio.officeTier);
+    updateStudio({ level: currentLevel, unlocks: newUnlocks });
+  }
+  
   // CONCEPT PHASE
   if (screen === 'concept') {
     return (
@@ -76,17 +87,25 @@ export default function Home() {
             budgetTier,
             budget,
             spent: 0,
+            remainingBudget: budget,
             assignedTalent: [],
             scenes: [],
-            phase: 'hiring',
-            productionProgress: 0,
-            productionDecisionsMade: [],
+            phase: 'planning',
+            stageProgress: {
+              stage: 'planning',
+              progress: 0,
+              weeksElapsed: 0,
+              decisionsMade: [],
+              currentDecision: undefined
+            },
+            allDecisionsMade: [],
+            weeksElapsed: 0,
             createdAt: Date.now()
           };
           
-          setProjectDraft(project);
           setCurrentProject(project);
           updateStudio({ cash: studio.cash - budget });
+          setHiringFor('planning');
           setScreen('hiring');
         }}
         onCancel={() => setScreen('office')}
@@ -94,27 +113,40 @@ export default function Home() {
     );
   }
   
-  // HIRING PHASE
+  // HIRING PHASE (for different stages)
   if (screen === 'hiring' && studio.currentProject) {
+    const requiredRoles: Record<ProductionPhase, TalentRole[]> = {
+      'concept': [],
+      'planning': ['Writer', 'Director'],
+      'preproduction': ['Cinematographer', 'Actor'],
+      'filming': [],
+      'postproduction': ['Editor', 'Sound Designer', 'VFX Artist'],
+      'marketing': [],
+      'released': []
+    };
+    
+    const required = requiredRoles[hiringFor] || [];
+    const availableRoles = studio.unlocks.availableRoles;
+    const filteredRequired = required.filter(r => availableRoles.includes(r));
+    
     return (
       <HiringPhase
         studio={studio}
-        budget={studio.currentProject.budget}
+        budget={studio.currentProject.remainingBudget}
         currentlyHired={studio.currentProject.assignedTalent}
+        requiredRoles={filteredRequired}
+        stageName={hiringFor}
         onConfirm={(hired) => {
           const totalSalary = hired.reduce((sum, t) => sum + t.salary, 0);
-          
-          // Free previously hired talent if changing selection
           const previouslyHired = studio.currentProject!.assignedTalent;
           const toFree = previouslyHired.filter(p => !hired.find(h => h.id === p.id));
           
           updateProject({
             assignedTalent: hired,
-            spent: totalSalary,
-            phase: 'scene-planning'
+            spent: studio.currentProject!.spent + totalSalary,
+            remainingBudget: studio.currentProject!.remainingBudget - totalSalary
           });
           
-          // Mark new talent as busy, free old talent
           updateStudio({
             talentPool: studio.talentPool.map(t => {
               if (hired.find(h => h.id === t.id)) return { ...t, busy: true };
@@ -123,17 +155,57 @@ export default function Home() {
             })
           });
           
-          setScreen('scene-planning');
+          // Move to next appropriate phase
+          if (hiringFor === 'planning') {
+            // Calculate script quality from writer
+            const scriptQuality = calculateRoleContribution(hired, 'Writer');
+            updateProject({ 
+              scriptQuality,
+              phase: 'preproduction',
+              stageProgress: {
+                stage: 'preproduction',
+                progress: 0,
+                weeksElapsed: 0,
+                decisionsMade: [],
+                currentDecision: undefined
+              }
+            });
+            setHiringFor('preproduction');
+            setScreen('hiring');
+          } else if (hiringFor === 'preproduction') {
+            const cinematographyQuality = calculateRoleContribution(hired, 'Cinematographer');
+            updateProject({ 
+              cinematographyQuality,
+              phase: 'filming',
+              stageProgress: {
+                stage: 'filming',
+                progress: 0,
+                weeksElapsed: 0,
+                decisionsMade: [],
+                currentDecision: undefined
+              }
+            });
+            setScreen('scene-planning');
+          } else if (hiringFor === 'postproduction') {
+            const editingQuality = calculateRoleContribution(hired, 'Editor');
+            const soundQuality = calculateRoleContribution(hired, 'Sound Designer');
+            const vfxQuality = calculateRoleContribution(hired, 'VFX Artist');
+            updateProject({ editingQuality, soundQuality, vfxQuality });
+            setScreen('stage');
+          }
         }}
         onBack={() => {
-          // Just go back to concept - preserve project
-          setScreen('concept');
+          if (hiringFor === 'planning') {
+            setScreen('concept');
+          } else {
+            setScreen('stage');
+          }
         }}
       />
     );
   }
   
-  // SCENE PLANNING PHASE
+  // SCENE PLANNING PHASE (during filming)
   if (screen === 'scene-planning' && studio.currentProject) {
     return (
       <ScenePlanner
@@ -148,45 +220,160 @@ export default function Home() {
           
           updateProject({
             scenes,
-            storyOutcome,
-            phase: 'production'
+            storyOutcome
           });
           
-          setScreen('production');
+          setScreen('stage');
         }}
-        onBack={() => setScreen('hiring')}
+        onBack={() => {
+          setHiringFor('preproduction');
+          setScreen('hiring');
+        }}
       />
     );
   }
   
-  // PRODUCTION PHASE
-  if (screen === 'production' && studio.currentProject) {
+  // STAGE SCREEN (Planning, Preproduction, Filming, Postproduction, Marketing)
+  if (screen === 'stage' && studio.currentProject) {
+    const project = studio.currentProject;
+    const stageNames: Record<ProductionPhase, string> = {
+      'concept': 'Concept',
+      'planning': 'Planning & Development',
+      'preproduction': 'Pre-Production',
+      'filming': 'Principal Photography',
+      'postproduction': 'Post-Production',
+      'marketing': 'Marketing & Distribution',
+      'released': 'Released'
+    };
+    
     return (
-      <ProductionPhase
-        project={studio.currentProject}
-        onComplete={() => {
-          updateProject({
-            productionProgress: 100,
-            phase: 'editing'
-          });
-          setScreen('editing');
-        }}
-      />
+      <>
+        <StageScreen
+          project={project}
+          studio={studio}
+          stage={project.stageProgress.stage}
+          stageName={stageNames[project.stageProgress.stage]}
+          onComplete={(updates) => {
+            const currentStage = project.stageProgress.stage;
+            
+            // Update time and events
+            const weeksElapsed = project.weeksElapsed + project.stageProgress.weeksElapsed;
+            const daysElapsed = studio.daysPassed + (project.stageProgress.weeksElapsed * 7);
+            updateStudio({ 
+              daysPassed: daysElapsed,
+              weeksPassed: studio.weeksPassed + project.stageProgress.weeksElapsed
+            });
+            
+            // Update events
+            const updatedStudio = updateActiveEvents(studio);
+            updateStudio({ activeEvents: updatedStudio.activeEvents });
+            
+            updateProject({ weeksElapsed, ...updates });
+            
+            // Determine next phase
+            if (currentStage === 'planning') {
+              setHiringFor('preproduction');
+              setScreen('hiring');
+            } else if (currentStage === 'preproduction') {
+              setScreen('scene-planning');
+            } else if (currentStage === 'filming') {
+              setHiringFor('postproduction');
+              setScreen('hiring');
+            } else if (currentStage === 'postproduction') {
+              updateProject({
+                phase: 'marketing',
+                stageProgress: {
+                  stage: 'marketing',
+                  progress: 0,
+                  weeksElapsed: 0,
+                  decisionsMade: [],
+                  currentDecision: undefined
+                }
+              });
+              setScreen('stage');
+            } else if (currentStage === 'marketing') {
+              const marketingReach = calculateRoleContribution(project.assignedTalent, 'Producer') || 50;
+              updateProject({ 
+                marketingReach
+              });
+              setScreen('editing');
+            }
+          }}
+          onShowDecision={(decision) => {
+            setCurrentDecision(decision);
+          }}
+        />
+        
+        {currentDecision && (
+          <DecisionModal
+            decision={currentDecision}
+            remainingBudget={project.remainingBudget}
+            onChoose={(choiceId) => {
+              const choice = currentDecision.options.find(o => o.id === choiceId);
+              if (!choice) return;
+              
+              // Apply decision effects
+              const newRemaining = project.remainingBudget - (choice.cost || 0);
+              const newProgress = project.stageProgress.progress + (choice.timeWeeks || 0) * 10;
+              
+              updateProject({
+                remainingBudget: newRemaining,
+                stageProgress: {
+                  ...project.stageProgress,
+                  decisionsMade: [...project.stageProgress.decisionsMade, choiceId]
+                },
+                allDecisionsMade: [
+                  ...project.allDecisionsMade,
+                  { stage: currentDecision.stage, decisionId: currentDecision.id, choiceId }
+                ]
+              });
+              
+              // Store quality modifiers for later
+              if (choice.qualityMod) {
+                const currentQuality = project.storyOutcome?.quality || 50;
+                updateProject({
+                  storyOutcome: {
+                    ...project.storyOutcome,
+                    quality: currentQuality + choice.qualityMod,
+                    tags: project.storyOutcome?.tags || [],
+                    audienceAppeal: (project.storyOutcome?.audienceAppeal || 0) + (choice.audienceMod || 0),
+                    criticAppeal: (project.storyOutcome?.criticAppeal || 0) + (choice.criticMod || 0)
+                  }
+                });
+              }
+              
+              setCurrentDecision(null);
+            }}
+          />
+        )}
+      </>
     );
   }
   
-  // EDITING PHASE
+  // EDITING PHASE (Final touches before release)
   if (screen === 'editing' && studio.currentProject) {
     return (
       <EditingPhase
         onConfirm={(editChoices) => {
           const project = studio.currentProject!;
+          
+          // Ensure storyOutcome exists
+          if (!project.storyOutcome) {
+            updateProject({
+              storyOutcome: {
+                quality: 50,
+                tags: [],
+                audienceAppeal: 0,
+                criticAppeal: 0
+              }
+            });
+          }
+          
           const results = calculateProjectResults(
-            { ...project, editChoices },
+            { ...project, editChoices, storyOutcome: project.storyOutcome || { quality: 50, tags: [], audienceAppeal: 0, criticAppeal: 0 } },
             studio
           );
           
-          // Apply results to studio
           const newCash = studio.cash + results.revenue;
           const newReputation = Math.max(0, Math.min(100, studio.reputation + results.reputationChange));
           const newFollowers = studio.audience.size + results.followersGained;
@@ -204,17 +391,10 @@ export default function Home() {
             audience: {
               ...studio.audience,
               size: newFollowers
-            },
-            daysPassed: studio.daysPassed + 30
+            }
           });
           
-          // Update trends
-          const updatedStudio = {
-            ...studio,
-            cash: newCash,
-            reputation: newReputation,
-            audience: { ...studio.audience, size: newFollowers }
-          };
+          const updatedStudio = { ...studio, cash: newCash, reputation: newReputation };
           updateTrends(updatedStudio);
           updateStudio({ trends: updatedStudio.trends });
           
@@ -231,7 +411,6 @@ export default function Home() {
       <ResultsScreen
         project={currentProject}
         onContinue={() => {
-          // Free up talent
           const freedTalent = currentProject.assignedTalent;
           updateStudio({
             talentPool: studio.talentPool.map(t =>
@@ -253,7 +432,12 @@ export default function Home() {
       onNewProject={() => setScreen('concept')}
       onContinueProject={() => {
         if (studio.currentProject) {
-          setScreen(studio.currentProject.phase as GameScreen);
+          const phase = studio.currentProject.phase;
+          if (phase === 'planning' || phase === 'preproduction' || phase === 'filming' || phase === 'postproduction' || phase === 'marketing') {
+            setScreen('stage');
+          } else {
+            setScreen('editing');
+          }
         }
       }}
     />
