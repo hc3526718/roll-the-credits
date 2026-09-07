@@ -1,9 +1,10 @@
 // Core game logic and calculations
 
 import { 
-  Studio, Project, ScenePanel, StoryOutcome, EditChoice, Talent, Genre, ProjectResults 
+  Studio, Project, ScenePanel, StoryOutcome, EditChoice, Talent, Genre, ProjectResults, TalentRole, ProductionPhase 
 } from './types';
 import { calculateChemistry } from './game-data';
+import { getEventEffects } from './industry-events';
 
 export function calculateBudget(format: Project['format'], tier: Project['budgetTier']): number {
   const base = {
@@ -13,6 +14,60 @@ export function calculateBudget(format: Project['format'], tier: Project['budget
   };
   
   return base[format][tier];
+}
+
+// Calculate crew contribution for specific roles
+export function calculateRoleContribution(talent: Talent[], role: TalentRole): number {
+  const crew = talent.filter(t => t.role === role);
+  if (crew.length === 0) return 0;
+  
+  // Average skill of crew in this role
+  const avgSkill = crew.reduce((sum, t) => sum + t.stats.skill, 0) / crew.length;
+  const avgFame = crew.reduce((sum, t) => sum + t.stats.fame, 0) / crew.length;
+  
+  // Base contribution (0-100 scale)
+  return Math.min(100, (avgSkill * 8) + (avgFame * 2));
+}
+
+// Calculate overall project quality from all crew
+export function calculateOverallQuality(project: Project): number {
+  let quality = 50;
+  
+  // Director - affects everything
+  const directorContrib = calculateRoleContribution(project.assignedTalent, 'Director');
+  quality += (directorContrib - 50) * 0.3;
+  
+  // Writer - script quality (if in planning stage)
+  if (project.scriptQuality) {
+    quality += (project.scriptQuality - 50) * 0.2;
+  }
+  
+  // Cinematographer - visual quality
+  if (project.cinematographyQuality) {
+    quality += (project.cinematographyQuality - 50) * 0.15;
+  }
+  
+  // Editor - pacing and flow
+  if (project.editingQuality) {
+    quality += (project.editingQuality - 50) * 0.15;
+  }
+  
+  // Sound - audio quality
+  if (project.soundQuality) {
+    quality += (project.soundQuality - 50) * 0.1;
+  }
+  
+  // VFX - visual effects
+  if (project.vfxQuality) {
+    quality += (project.vfxQuality - 50) * 0.1;
+  }
+  
+  // Story outcome from scene planning
+  if (project.storyOutcome) {
+    quality += (project.storyOutcome.quality - 50) * 0.3;
+  }
+  
+  return Math.max(0, Math.min(100, quality));
 }
 
 export function analyzeSceneQuality(
@@ -175,9 +230,12 @@ export function calculateProjectResults(
   const { storyOutcome, editChoices } = project;
   const { audienceMod, criticMod } = calculateEditingImpact(editChoices, storyOutcome);
   
-  // Base scores
-  let audienceScore = storyOutcome.quality + storyOutcome.audienceAppeal + audienceMod;
-  let criticScore = storyOutcome.quality + storyOutcome.criticAppeal + criticMod;
+  // Calculate overall quality from all crew contributions
+  const overallQuality = calculateOverallQuality(project);
+  
+  // Base scores using overall quality
+  let audienceScore = overallQuality + storyOutcome.audienceAppeal + audienceMod;
+  let criticScore = overallQuality + storyOutcome.criticAppeal + criticMod;
   
   // Trend bonus
   const matchingTrend = studio.trends.find(t => t.genre === project.genre);
@@ -188,6 +246,16 @@ export function calculateProjectResults(
   
   // Studio reputation affects critic score
   criticScore += (studio.reputation - 50) / 10;
+  
+  // Industry events effects
+  const eventEffects = getEventEffects(studio.activeEvents);
+  audienceScore += eventEffects.audienceBoost;
+  criticScore += eventEffects.criticBoost;
+  
+  // Marketing reach bonus
+  if (project.marketingReach) {
+    audienceScore += project.marketingReach * 0.3;
+  }
   
   // Clamp scores
   audienceScore = Math.max(0, Math.min(100, audienceScore));
