@@ -6,14 +6,20 @@ import { Talent, TalentRole, Studio } from '@/lib/types';
 interface HiringPhaseProps {
   studio: Studio;
   budget: number;
+  currentlyHired?: Talent[];
   onConfirm: (hired: Talent[]) => void;
   onBack: () => void;
 }
 
-export default function HiringPhase({ studio, budget, onConfirm, onBack }: HiringPhaseProps) {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+export default function HiringPhase({ studio, budget, currentlyHired = [], onConfirm, onBack }: HiringPhaseProps) {
+  const [selected, setSelected] = useState<Set<string>>(
+    new Set(currentlyHired.map(t => t.id))
+  );
   
-  const availableTalent = studio.talentPool.filter(t => !t.busy);
+  // Show all talent including currently hired ones
+  const availableTalent = studio.talentPool.filter(t => 
+    !t.busy || currentlyHired.some(h => h.id === t.id)
+  );
   
   const selectedTalent = availableTalent.filter(t => selected.has(t.id));
   const totalCost = selectedTalent.reduce((sum, t) => sum + t.salary, 0);
@@ -24,7 +30,11 @@ export default function HiringPhase({ studio, budget, onConfirm, onBack }: Hirin
     'Director': '🎬',
     'Writer': '✍️',
     'Cinematographer': '📷',
-    'Editor': '✂️'
+    'Editor': '✂️',
+    'Sound Designer': '🔊',
+    'VFX Artist': '✨',
+    'Composer': '🎵',
+    'Producer': '📋'
   };
   
   const toggleTalent = (id: string) => {

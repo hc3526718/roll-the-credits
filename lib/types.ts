@@ -4,7 +4,7 @@ export type ProjectFormat = 'Feature' | 'Limited Series' | 'Short';
 export type Genre = 'Action' | 'Drama' | 'Comedy' | 'Horror' | 'Romance' | 'Thriller' | 'Sci-Fi' | 'Fantasy';
 export type BudgetTier = 'Micro' | 'Low' | 'Mid' | 'High';
 
-export type TalentRole = 'Actor' | 'Director' | 'Writer' | 'Cinematographer' | 'Editor';
+export type TalentRole = 'Actor' | 'Director' | 'Writer' | 'Cinematographer' | 'Editor' | 'Sound Designer' | 'VFX Artist' | 'Composer' | 'Producer';
 
 export interface ChemistryTag {
   tag: string;
@@ -44,9 +44,11 @@ export interface Audience {
 export type SceneSetting = 'Interior' | 'Exterior-Day' | 'Exterior-Night' | 'Special-Effects';
 
 export interface ScenePanel {
+  id: string;
   setting: SceneSetting;
-  characters: string[]; // Talent IDs
+  characters: string[]; // Talent IDs - can appear in multiple scenes
   position: number; // panel order 0-4
+  importance: 'key' | 'supporting' | 'transition'; // Scene weight
 }
 
 export interface StoryOutcome {
@@ -56,16 +58,39 @@ export interface StoryOutcome {
   criticAppeal: number; // modifier
 }
 
-export type ProductionPhase = 'concept' | 'hiring' | 'scene-planning' | 'production' | 'editing' | 'released';
+export type ProductionPhase = 
+  | 'concept' 
+  | 'planning'        // Development - Writer, script decisions
+  | 'preproduction'   // Pre-vis - Cinematographer, schedule
+  | 'filming'         // Production - Scene planner, filming decisions
+  | 'postproduction'  // Post - Editor, Sound, VFX
+  | 'marketing'       // Distribution - Campaign strategy
+  | 'released';
 
-export interface ProductionDecision {
+export interface StageDecision {
   id: string;
+  stage: ProductionPhase;
   text: string;
+  description: string;
   options: {
+    id: string;
     label: string;
+    description: string;
     cost?: number;
-    effect: string;
+    timeWeeks?: number;
+    qualityMod?: number;
+    audienceMod?: number;
+    criticMod?: number;
+    riskLevel?: 'low' | 'medium' | 'high';
   }[];
+}
+
+export interface StageProgress {
+  stage: ProductionPhase;
+  progress: number; // 0-100
+  weeksElapsed: number;
+  decisionsMade: string[];
+  currentDecision?: StageDecision;
 }
 
 export interface EditChoice {
@@ -92,21 +117,67 @@ export interface Project {
   budgetTier: BudgetTier;
   budget: number;
   spent: number;
+  remainingBudget: number;
   
-  assignedTalent: Talent[];
+  assignedTalent: Talent[]; // All crew across all stages
   scenes: ScenePanel[];
   storyOutcome?: StoryOutcome;
   
   phase: ProductionPhase;
-  productionProgress: number; // 0-100
-  productionDecisionsMade: string[];
+  stageProgress: StageProgress;
+  allDecisionsMade: { stage: ProductionPhase; decisionId: string; choiceId: string }[];
+  
+  // Stage-specific data
+  scriptQuality?: number;
+  cinematographyQuality?: number;
+  editingQuality?: number;
+  soundQuality?: number;
+  vfxQuality?: number;
+  marketingReach?: number;
   
   editChoices?: EditChoice;
   
   results?: ProjectResults;
   
+  weeksElapsed: number;
   createdAt: number;
   releasedAt?: number;
+}
+
+export type IndustryEventType = 
+  | 'writer-strike'
+  | 'actor-burnout'
+  | 'union-action'
+  | 'festival-invite'
+  | 'streaming-war'
+  | 'weather-delay'
+  | 'test-screening-leak'
+  | 'awards-buzz';
+
+export interface IndustryEvent {
+  id: string;
+  type: IndustryEventType;
+  name: string;
+  description: string;
+  startDay: number;
+  duration: number; // days
+  effects: {
+    blockedRoles?: TalentRole[];
+    salaryModifier?: number;
+    audienceBoost?: number;
+    criticBoost?: number;
+    reputationChange?: number;
+  };
+}
+
+export interface StudioUnlocks {
+  maxActors: number;
+  maxSupporting: number;
+  availableRoles: TalentRole[];
+  marketingUnlocked: boolean;
+  testScreeningsUnlocked: boolean;
+  festivalSubmissionUnlocked: boolean;
+  advancedTrendsUnlocked: boolean;
 }
 
 export interface Studio {
@@ -114,15 +185,19 @@ export interface Studio {
   cash: number;
   reputation: number; // 0-100
   officeTier: 'garage' | 'small' | 'medium' | 'large';
+  level: number; // Studio level for progression
   
   audience: Audience;
   talentPool: Talent[];
   trends: Trend[];
+  unlocks: StudioUnlocks;
+  activeEvents: IndustryEvent[];
   
   currentProject?: Project;
   completedProjects: Project[];
   
   daysPassed: number;
+  weeksPassed: number;
 }
 
 export interface GameState {

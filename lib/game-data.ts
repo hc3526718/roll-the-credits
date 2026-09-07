@@ -38,7 +38,18 @@ export function generateTalent(role: TalentRole, id: string): Talent {
     () => CHEMISTRY_TAGS[Math.floor(Math.random() * CHEMISTRY_TAGS.length)]
   ).filter((tag, idx, arr) => arr.indexOf(tag) === idx);
   
-  const baseSalary = role === 'Actor' ? 5000 : 3000;
+  const salaryBase: Record<TalentRole, number> = {
+    'Actor': 5000,
+    'Director': 8000,
+    'Writer': 4000,
+    'Cinematographer': 4500,
+    'Editor': 3500,
+    'Sound Designer': 3000,
+    'VFX Artist': 4000,
+    'Composer': 3500,
+    'Producer': 6000
+  };
+  const baseSalary = salaryBase[role] || 3000;
   const salary = Math.floor(baseSalary * (skill / 5) * (fame / 5));
   
   return {
@@ -60,18 +71,23 @@ export function generateInitialTalentPool(): Talent[] {
   const pool: Talent[] = [];
   let id = 0;
   
-  // Generate talent distribution
-  const roles: TalentRole[] = ['Actor', 'Director', 'Writer', 'Cinematographer', 'Editor'];
-  const counts: Record<TalentRole, number> = {
-    'Actor': 8,
-    'Director': 4,
-    'Writer': 4,
-    'Cinematographer': 3,
-    'Editor': 3
+  // Generate talent distribution - start with basics, more unlock later
+  const roles: TalentRole[] = ['Actor', 'Director', 'Writer', 'Cinematographer', 'Editor', 'Sound Designer', 'VFX Artist', 'Composer', 'Producer'];
+  const counts: Partial<Record<TalentRole, number>> = {
+    'Actor': 12,
+    'Director': 5,
+    'Writer': 5,
+    'Cinematographer': 4,
+    'Editor': 4,
+    'Sound Designer': 3,
+    'VFX Artist': 3,
+    'Composer': 2,
+    'Producer': 2
   };
   
   roles.forEach(role => {
-    for (let i = 0; i < counts[role]; i++) {
+    const count = counts[role] || 0;
+    for (let i = 0; i < count; i++) {
       pool.push(generateTalent(role, `talent-${id++}`));
     }
   });

@@ -31,6 +31,7 @@ function createInitialStudio(name: string): Studio {
     cash: 100000,
     reputation: 50,
     officeTier: 'garage',
+    level: 1,
     audience: {
       size: 1000,
       tasteVector,
@@ -38,8 +39,19 @@ function createInitialStudio(name: string): Studio {
     },
     talentPool: generateInitialTalentPool(),
     trends: generateInitialTrends(),
+    unlocks: {
+      maxActors: 3,
+      maxSupporting: 1,
+      availableRoles: ['Actor', 'Director'],
+      marketingUnlocked: false,
+      testScreeningsUnlocked: false,
+      festivalSubmissionUnlocked: false,
+      advancedTrendsUnlocked: false
+    },
+    activeEvents: [],
     completedProjects: [],
-    daysPassed: 0
+    daysPassed: 0,
+    weeksPassed: 0
   };
 }
 

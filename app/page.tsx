@@ -100,8 +100,13 @@ export default function Home() {
       <HiringPhase
         studio={studio}
         budget={studio.currentProject.budget}
+        currentlyHired={studio.currentProject.assignedTalent}
         onConfirm={(hired) => {
           const totalSalary = hired.reduce((sum, t) => sum + t.salary, 0);
+          
+          // Free previously hired talent if changing selection
+          const previouslyHired = studio.currentProject!.assignedTalent;
+          const toFree = previouslyHired.filter(p => !hired.find(h => h.id === p.id));
           
           updateProject({
             assignedTalent: hired,
@@ -109,20 +114,20 @@ export default function Home() {
             phase: 'scene-planning'
           });
           
-          // Mark talent as busy
+          // Mark new talent as busy, free old talent
           updateStudio({
-            talentPool: studio.talentPool.map(t =>
-              hired.find(h => h.id === t.id) ? { ...t, busy: true } : t
-            )
+            talentPool: studio.talentPool.map(t => {
+              if (hired.find(h => h.id === t.id)) return { ...t, busy: true };
+              if (toFree.find(f => f.id === t.id)) return { ...t, busy: false };
+              return t;
+            })
           });
           
           setScreen('scene-planning');
         }}
         onBack={() => {
-          // Refund budget and cancel project
-          updateStudio({ cash: studio.cash + studio.currentProject!.budget });
-          setCurrentProject(undefined);
-          setScreen('office');
+          // Just go back to concept - preserve project
+          setScreen('concept');
         }}
       />
     );
@@ -133,6 +138,7 @@ export default function Home() {
     return (
       <ScenePlanner
         talent={studio.currentProject.assignedTalent}
+        existingScenes={studio.currentProject.scenes}
         onConfirm={(scenes) => {
           const storyOutcome = analyzeSceneQuality(
             scenes,

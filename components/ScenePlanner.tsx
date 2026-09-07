@@ -6,31 +6,38 @@ import { calculateChemistry } from '@/lib/game-data';
 
 interface ScenePlannerProps {
   talent: Talent[];
+  existingScenes?: ScenePanel[];
   onConfirm: (scenes: ScenePanel[]) => void;
   onBack: () => void;
 }
 
-export default function ScenePlanner({ talent, onConfirm, onBack }: ScenePlannerProps) {
-  const [scenes, setScenes] = useState<ScenePanel[]>([
-    { setting: 'Interior', characters: [], position: 0 },
-    { setting: 'Exterior-Day', characters: [], position: 1 },
-    { setting: 'Interior', characters: [], position: 2 }
-  ]);
+export default function ScenePlanner({ talent, existingScenes, onConfirm, onBack }: ScenePlannerProps) {
+  const [scenes, setScenes] = useState<ScenePanel[]>(
+    existingScenes && existingScenes.length > 0 
+      ? existingScenes 
+      : [
+        { id: `scene-0`, setting: 'Interior', characters: [], position: 0, importance: 'key' },
+        { id: `scene-1`, setting: 'Exterior-Day', characters: [], position: 1, importance: 'supporting' },
+        { id: `scene-2`, setting: 'Interior', characters: [], position: 2, importance: 'key' }
+      ]
+  );
   
   const [draggedTalent, setDraggedTalent] = useState<string | null>(null);
   
   const settings: SceneSetting[] = ['Interior', 'Exterior-Day', 'Exterior-Night', 'Special-Effects'];
   const actors = talent.filter(t => t.role === 'Actor');
   
-  const assignedIds = new Set(scenes.flatMap(s => s.characters));
-  const unassigned = actors.filter(a => !assignedIds.has(a.id));
+  // Actors can now appear in multiple scenes, so show all actors always
+  const availableActors = actors;
   
   const addScene = () => {
     if (scenes.length < 5) {
       setScenes([...scenes, { 
+        id: `scene-${Date.now()}`,
         setting: 'Interior', 
         characters: [], 
-        position: scenes.length 
+        position: scenes.length,
+        importance: 'supporting'
       }]);
     }
   };
@@ -62,8 +69,8 @@ export default function ScenePlanner({ talent, onConfirm, onBack }: ScenePlanner
     ));
   };
   
-  const allActorsUsed = actors.every(a => assignedIds.has(a.id));
-  const hasContent = scenes.every(s => s.characters.length > 0);
+  // At least one scene must have content
+  const hasContent = scenes.some(s => s.characters.length > 0);
   
   const getChemistryColor = (chem: number) => {
     if (chem >= 70) return 'text-green-400';
@@ -184,33 +191,43 @@ export default function ScenePlanner({ talent, onConfirm, onBack }: ScenePlanner
           
           {/* Available Actors */}
           <div className="bg-slate-700 rounded-lg p-4">
-            <h3 className="text-sm font-bold text-purple-300 mb-3">AVAILABLE ACTORS</h3>
+            <h3 className="text-sm font-bold text-purple-300 mb-3">ACTORS (can appear in multiple scenes)</h3>
             <div className="flex flex-wrap gap-2">
-              {unassigned.length === 0 ? (
-                <p className="text-sm text-slate-400">All actors assigned! ✓</p>
+              {availableActors.length === 0 ? (
+                <p className="text-sm text-slate-400">No actors hired</p>
               ) : (
-                unassigned.map(actor => (
-                  <div
-                    key={actor.id}
-                    draggable
-                    onDragStart={() => setDraggedTalent(actor.id)}
-                    onDragEnd={() => setDraggedTalent(null)}
-                    className="px-3 py-2 bg-slate-800 border-2 border-slate-600 rounded cursor-move hover:border-purple-500 transition-colors"
-                  >
-                    <p className="text-sm font-bold">{actor.name}</p>
-                    <div className="flex gap-2 text-xs text-slate-400 mt-1">
-                      <span>Skill: {actor.stats.skill}</span>
-                      <span>Fame: {actor.stats.fame}</span>
+                availableActors.map(actor => {
+                  const usageCount = scenes.filter(s => s.characters.includes(actor.id)).length;
+                  return (
+                    <div
+                      key={actor.id}
+                      draggable
+                      onDragStart={() => setDraggedTalent(actor.id)}
+                      onDragEnd={() => setDraggedTalent(null)}
+                      className={`px-3 py-2 bg-slate-800 border-2 rounded cursor-move hover:border-purple-500 transition-colors ${
+                        usageCount > 0 ? 'border-purple-600' : 'border-slate-600'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <p className="text-sm font-bold">{actor.name}</p>
+                        {usageCount > 0 && (
+                          <span className="text-xs bg-purple-600 px-1 rounded">{usageCount}×</span>
+                        )}
+                      </div>
+                      <div className="flex gap-2 text-xs text-slate-400 mt-1">
+                        <span>Skill: {actor.stats.skill}</span>
+                        <span>Fame: {actor.stats.fame}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {actor.chemistryTags.slice(0, 2).map(tag => (
+                          <span key={tag} className="text-xs px-1 bg-slate-700 rounded">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {actor.chemistryTags.slice(0, 2).map(tag => (
-                        <span key={tag} className="text-xs px-1 bg-slate-700 rounded">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -246,7 +263,7 @@ export default function ScenePlanner({ talent, onConfirm, onBack }: ScenePlanner
           
           {!hasContent && (
             <p className="mt-4 text-center text-sm text-red-400">
-              All scenes must have at least one character
+              At least one scene must have a character
             </p>
           )}
         </div>
