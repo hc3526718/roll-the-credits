@@ -71,13 +71,29 @@ export function GameProvider({ children }: { children: ReactNode }) {
   
   const [isPaused, setIsPaused] = useState(true); // Start paused (on title screen)
   const tickTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasTriedLoadRef = useRef(false);
   
+  // Load save on mount - run once only
   useEffect(() => {
-    // Try to load save on mount
-    const loaded = loadGameFromStorage();
-    if (loaded) {
-      setState(loaded);
-      setIsPaused(false); // Resume time when loading game
+    if (hasTriedLoadRef.current) return;
+    hasTriedLoadRef.current = true;
+    
+    try {
+      const loaded = loadGameFromStorage();
+      if (loaded) {
+        setState(loaded);
+        setIsPaused(false); // Resume time when loading game
+      }
+    } catch (error) {
+      console.error('Failed to load game on mount:', error);
+      // Clear corrupt save
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
     }
   }, []);
   
@@ -334,50 +350,53 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Auto-tick system: 4 ticks = 1 week
   useEffect(() => {
     if (!state.initialized || isPaused) {
+      // Clear any existing timer when paused
+      if (tickTimerRef.current) {
+        clearTimeout(tickTimerRef.current);
+        tickTimerRef.current = null;
+      }
       return;
     }
     
     const tick = () => {
-      setState(prev => {
-        const newTick = prev.studio.currentTick + 1;
-        
-        if (newTick >= TICKS_PER_WEEK) {
-          // Week complete, advance week
-          return prev; // advanceWeek will be called separately
-        }
-        
-        return {
+      const currentTick = state.studio.currentTick;
+      
+      if (currentTick + 1 >= TICKS_PER_WEEK) {
+        // Week is complete - advance the week and reset tick
+        advanceWeek();
+        setState(prev => ({
           ...prev,
           studio: {
             ...prev.studio,
-            currentTick: newTick
+            currentTick: 0
           }
-        };
-      });
+        }));
+      } else {
+        // Just increment the tick
+        setState(prev => ({
+          ...prev,
+          studio: {
+            ...prev.studio,
+            currentTick: prev.studio.currentTick + 1
+          }
+        }));
+      }
     };
+    
+    // Clear any existing timer before setting new one
+    if (tickTimerRef.current) {
+      clearTimeout(tickTimerRef.current);
+    }
     
     tickTimerRef.current = setTimeout(tick, TICK_DURATION_MS);
     
     return () => {
       if (tickTimerRef.current) {
         clearTimeout(tickTimerRef.current);
+        tickTimerRef.current = null;
       }
     };
   }, [state.studio.currentTick, state.initialized, isPaused]);
-  
-  // Auto-advance week when 4 ticks complete
-  useEffect(() => {
-    if (state.studio.currentTick >= TICKS_PER_WEEK && !isPaused) {
-      advanceWeek();
-      setState(prev => ({
-        ...prev,
-        studio: {
-          ...prev.studio,
-          currentTick: 0
-        }
-      }));
-    }
-  }, [state.studio.currentTick, isPaused]);
   
   return (
     <GameContext.Provider value={{
