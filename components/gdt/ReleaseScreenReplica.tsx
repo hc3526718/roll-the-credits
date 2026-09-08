@@ -6,7 +6,7 @@ interface ReleaseScreenReplicaProps {
   projectName: string;
   genre: string;
   tone: string;
-  results: ProjectResults;
+  results: ProjectResults & { postMortem?: { strengths: string[]; weaknesses: string[]; comboRevealed?: string } };
   onContinue: () => void;
 }
 
@@ -136,6 +136,44 @@ export default function ReleaseScreenReplica({
                 <span>OPENING RUN</span>
                 <span>WEEK {results.weeklySales.length}</span>
               </div>
+            </div>
+          )}
+          
+          {/* POST-MORTEM: What Worked / What Didn't (Owner Design) */}
+          {results.postMortem && (
+            <div className="mt-8 mb-6 grid grid-cols-2 gap-4">
+              {/* Strengths */}
+              {results.postMortem.strengths.length > 0 && (
+                <div className="pixel-border bg-green-900/20 border-green-600 p-4">
+                  <p className="text-sm font-bold text-green-400 mb-2 pixel-text">✓ WHAT WORKED</p>
+                  <ul className="space-y-1 text-sm text-green-200">
+                    {results.postMortem.strengths.map((s, i) => (
+                      <li key={i} className="pixel-text">• {s}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* Weaknesses */}
+              {results.postMortem.weaknesses.length > 0 && (
+                <div className="pixel-border bg-red-900/20 border-red-600 p-4">
+                  <p className="text-sm font-bold text-red-400 mb-2 pixel-text">✗ WHAT DIDN'T</p>
+                  <ul className="space-y-1 text-sm text-red-200">
+                    {results.postMortem.weaknesses.map((w, i) => (
+                      <li key={i} className="pixel-text">• {w}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* Combo reveal */}
+              {results.postMortem.comboRevealed && (
+                <div className="col-span-2 pixel-border bg-purple-900/30 border-purple-500 p-4 text-center">
+                  <p className="text-sm font-bold text-purple-300 pixel-text">
+                    💡 COMBO DISCOVERED: {results.postMortem.comboRevealed}
+                  </p>
+                </div>
+              )}
             </div>
           )}
           

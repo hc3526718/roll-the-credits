@@ -3,7 +3,7 @@
 import { useGame } from '@/lib/game-context-gdt';
 import { useState, useEffect } from 'react';
 import { Project, PhaseAllocation, Contract, DevelopmentStage } from '@/lib/types-gdt';
-import { calculateBudget, completeProject as calculateResults } from '@/lib/project-gdt';
+import { calculateBudget, completeProject as calculateResults, generatePostMortem } from '@/lib/project-gdt';
 
 // Replica Screens
 import TitleScreen from '@/components/gdt/TitleScreen';
@@ -247,11 +247,9 @@ export default function Home() {
               ...currentProject, 
               phaseState: { ...currentProject.phaseState, allocation: updatedAllocation, marketingComplete: true } 
             };
-            const results = calculateResults(
-              updatedProject,
-              studio.staff.filter(s => currentProject.assignedStaff.includes(s.id)),
-              studio.fans
-            );
+            const assignedStaffMembers = studio.staff.filter(s => currentProject.assignedStaff.includes(s.id));
+            const results = calculateResults(updatedProject, assignedStaffMembers, studio.fans);
+            const postMortem = generatePostMortem(updatedProject, assignedStaffMembers, results);
             
             completeProjectInStudio(currentProject.id);
             updateStudio({
@@ -259,7 +257,13 @@ export default function Home() {
               fans: studio.fans + results.fansGained,
               reputation: Math.min(100, studio.reputation + results.reputationChange)
             });
-            setReleaseResults({ ...results, projectName: currentProject.name, genre: currentProject.genre, tone: currentProject.tone });
+            setReleaseResults({ 
+              ...results, 
+              projectName: currentProject.name, 
+              genre: currentProject.genre, 
+              tone: currentProject.tone,
+              postMortem 
+            });
             saveGame();
             setScreen('release');
           } else {
