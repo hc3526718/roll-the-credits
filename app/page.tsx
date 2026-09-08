@@ -3,7 +3,9 @@
 import { useGame } from '@/lib/game-context';
 import { useState } from 'react';
 import StartScreen from '@/components/StartScreen';
-import OfficeView from '@/components/OfficeView';
+import OfficeViewCompact from '@/components/OfficeViewCompact';
+import TutorialScreen from '@/components/TutorialScreen';
+import ContractBoard from '@/components/ContractBoard';
 import ConceptPhase from '@/components/ConceptPhase';
 import HiringPhase from '@/components/HiringPhase';
 import ScenePlanner from '@/components/ScenePlanner';
@@ -11,25 +13,39 @@ import StageScreen from '@/components/StageScreen';
 import DecisionModal from '@/components/DecisionModal';
 import EditingPhase from '@/components/EditingPhase';
 import ResultsScreen from '@/components/ResultsScreen';
-import { Project, Talent, ScenePanel, EditChoice, StageDecision, ProductionPhase, TalentRole } from '@/lib/types';
+import { Project, Talent, ScenePanel, EditChoice, StageDecision, ProductionPhase, TalentRole, ContractJob, TutorialStep } from '@/lib/types';
 import { calculateBudget, analyzeSceneQuality, calculateProjectResults, updateTrends, calculateRoleContribution } from '@/lib/game-logic';
 import { updateActiveEvents } from '@/lib/industry-events';
 import { calculateStudioLevel, getUnlocksForLevel } from '@/lib/progression';
+import { generateContractBoard } from '@/lib/contracts';
+import { getAccessibleTalent, generateInitialFriendTalent } from '@/lib/game-data';
 
-type GameScreen = 'start' | 'office' | 'concept' | 'stage' | 'hiring' | 'scene-planning' | 'editing' | 'results';
+type GameScreen = 'start' | 'tutorial' | 'office' | 'contracts' | 'concept' | 'stage' | 'hiring' | 'scene-planning' | 'editing' | 'results';
 
 export default function Home() {
-  const { state, initializeGame, loadGame, updateStudio, setCurrentProject, updateProject, completeProject, saveGame } = useGame();
+  const { state, initializeGame, loadGame, updateStudio, setCurrentProject, updateProject, completeProject, saveGame, updateTutorialProgress, advanceWeek } = useGame();
   const [screen, setScreen] = useState<GameScreen>('start');
   const [currentDecision, setCurrentDecision] = useState<StageDecision | null>(null);
   const [hiringFor, setHiringFor] = useState<ProductionPhase>('planning');
+  const [debtWarning, setDebtWarning] = useState<string | null>(null);
   
   if (!state.initialized && screen !== 'start') {
     return (
       <StartScreen
-        onStart={(name) => {
-          initializeGame(name);
-          setScreen('office');
+        onStart={(studioName, founderName, skipTutorial) => {
+          initializeGame(studioName, founderName, skipTutorial);
+          
+          // v2: Add friend talent to pool for early game
+          const friendTalent = generateInitialFriendTalent();
+          updateStudio({
+            talentPool: [...state.studio.talentPool, ...friendTalent]
+          });
+          
+          if (skipTutorial) {
+            setScreen('office');
+          } else {
+            setScreen('tutorial');
+          }
         }}
         onLoad={() => {
           const loaded = loadGame();
@@ -46,9 +62,20 @@ export default function Home() {
   if (screen === 'start') {
     return (
       <StartScreen
-        onStart={(name) => {
-          initializeGame(name);
-          setScreen('office');
+        onStart={(studioName, founderName, skipTutorial) => {
+          initializeGame(studioName, founderName, skipTutorial);
+          
+          // v2: Add friend talent to pool for early game
+          const friendTalent = generateInitialFriendTalent();
+          updateStudio({
+            talentPool: [...state.studio.talentPool, ...friendTalent]
+          });
+          
+          if (skipTutorial) {
+            setScreen('office');
+          } else {
+            setScreen('tutorial');
+          }
         }}
         onLoad={() => {
           const loaded = loadGame();
@@ -64,10 +91,82 @@ export default function Home() {
   
   const studio = state.studio;
   
+  // v2: Tutorial screen
+  if (screen === 'tutorial' && state.tutorialProgress.active) {
+    return (
+      <TutorialScreen
+        currentStep={state.tutorialProgress.currentStep}
+        onNext={() => {
+          const steps: TutorialStep[] = [
+            'welcome', 'name-founder', 'explain-calendar', 'show-contracts', 
+            'first-contract', 'explain-projects', 'first-project', 
+            'scene-planner', 'release-results', 'complete'
+          ];
+          const currentIndex = steps.indexOf(state.tutorialProgress.currentStep);
+          
+          if (currentIndex < steps.length - 1) {
+            const nextStep = steps[currentIndex + 1];
+            
+            // Special handling for certain steps
+            if (nextStep === 'show-contracts') {
+              const contracts = generateContractBoard();
+              updateStudio({ activeContracts: contracts });
+              setScreen('contracts');
+            } else if (nextStep === 'complete') {
+              updateTutorialProgress('complete');
+              setScreen('office');
+            } else {
+              updateTutorialProgress(nextStep);
+            }
+          } else {
+            setScreen('office');
+          }
+        }}
+        onSkip={() => {
+          updateTutorialProgress('complete');
+          setScreen('office');
+        }}
+      />
+    );
+  }
+  
+  // v2: Contract Board screen
+  if (screen === 'contracts') {
+    const availableContracts = studio.activeContracts.filter(c => !c.active);
+    const activeContracts = studio.activeContracts.filter(c => c.active);
+    
+    return (
+      <ContractBoard
+        availableContracts={availableContracts}
+        activeContracts={activeContracts}
+        employees={studio.employees}
+        availableRoles={studio.unlocks.availableRoles}
+        onAcceptContract={(contract) => {
+          const updatedContracts = studio.activeContracts.map(c =>
+            c.id === contract.id ? { ...c, active: true, weeksRemaining: c.durationWeeks } : c
+          );
+          updateStudio({ activeContracts: updatedContracts });
+          
+          // Tutorial progression
+          if (state.tutorialProgress.active && state.tutorialProgress.currentStep === 'first-contract') {
+            updateTutorialProgress('explain-projects');
+          }
+        }}
+        onCancelContract={(contractId) => {
+          const updatedContracts = studio.activeContracts.map(c =>
+            c.id === contractId ? { ...c, active: false } : c
+          );
+          updateStudio({ activeContracts: updatedContracts });
+        }}
+        onClose={() => setScreen('office')}
+      />
+    );
+  }
+  
   // Update studio level and unlocks
   const currentLevel = calculateStudioLevel(studio);
   if (currentLevel !== studio.level) {
-    const newUnlocks = getUnlocksForLevel(currentLevel, studio.officeTier);
+    const newUnlocks = getUnlocksForLevel(currentLevel, studio.studioTier);
     updateStudio({ level: currentLevel, unlocks: newUnlocks });
   }
   
@@ -78,6 +177,22 @@ export default function Home() {
         studio={studio}
         onConfirm={({ name, format, genre, budgetTier }) => {
           const budget = calculateBudget(format, budgetTier);
+          
+          // v2: Debt warning if going over budget
+          const netCash = studio.cash - studio.debt;
+          if (netCash < budget) {
+            const shortfall = budget - netCash;
+            const goingIntoDebt = netCash < 0 || shortfall > netCash;
+            
+            if (goingIntoDebt && !confirm(
+              `⚠️ BUDGET WARNING\n\n` +
+              `This project costs $${budget.toLocaleString()} but you only have $${netCash.toLocaleString()} available.\n\n` +
+              `This will put you $${shortfall.toLocaleString()} in debt. You'll need contract work or box office success to recover.\n\n` +
+              `Proceed anyway?`
+            )) {
+              return; // Cancel if they don't want to risk debt
+            }
+          }
           
           const project: Project = {
             id: `project-${Date.now()}`,
@@ -104,7 +219,18 @@ export default function Home() {
           };
           
           setCurrentProject(project);
-          updateStudio({ cash: studio.cash - budget });
+          
+          // v2: Update cash and debt
+          const newCash = studio.cash - budget;
+          if (newCash < 0) {
+            updateStudio({ 
+              cash: 0,
+              debt: studio.debt + Math.abs(newCash)
+            });
+          } else {
+            updateStudio({ cash: newCash });
+          }
+          
           setHiringFor('planning');
           setScreen('hiring');
         }}
@@ -129,9 +255,13 @@ export default function Home() {
     const availableRoles = studio.unlocks.availableRoles;
     const filteredRequired = required.filter(r => availableRoles.includes(r));
     
+    // v2: Filter talent by reputation (gating system)
+    const accessibleTalent = getAccessibleTalent(studio.talentPool, studio.reputation);
+    const gatedStudio = { ...studio, talentPool: accessibleTalent };
+    
     return (
       <HiringPhase
-        studio={studio}
+        studio={gatedStudio}
         budget={studio.currentProject.remainingBudget}
         currentlyHired={studio.currentProject.assignedTalent}
         requiredRoles={filteredRequired}
@@ -425,11 +555,17 @@ export default function Home() {
     );
   }
   
-  // OFFICE VIEW (default)
+  // OFFICE VIEW (default) - v2: Compact version
   return (
-    <OfficeView
+    <OfficeViewCompact
       studio={studio}
-      onNewProject={() => setScreen('concept')}
+      onNewProject={() => {
+        // Tutorial progression
+        if (state.tutorialProgress.active && state.tutorialProgress.currentStep === 'first-project') {
+          updateTutorialProgress('scene-planner');
+        }
+        setScreen('concept');
+      }}
       onContinueProject={() => {
         if (studio.currentProject) {
           const phase = studio.currentProject.phase;
@@ -439,6 +575,18 @@ export default function Home() {
             setScreen('editing');
           }
         }
+      }}
+      onViewContracts={() => {
+        // Generate new contracts if board is empty
+        if (studio.activeContracts.length === 0) {
+          const contracts = generateContractBoard();
+          updateStudio({ activeContracts: contracts });
+        }
+        setScreen('contracts');
+      }}
+      onAdvanceWeek={() => {
+        advanceWeek();
+        saveGame();
       }}
     />
   );

@@ -3,13 +3,15 @@
 import { useState } from 'react';
 
 interface StartScreenProps {
-  onStart: (studioName: string) => void;
+  onStart: (studioName: string, founderName: string, skipTutorial: boolean) => void;
   onLoad: () => boolean;
 }
 
 export default function StartScreen({ onStart, onLoad }: StartScreenProps) {
   const [studioName, setStudioName] = useState('');
+  const [founderName, setFounderName] = useState('');
   const [showNewGame, setShowNewGame] = useState(false);
+  const [skipTutorial, setSkipTutorial] = useState(false);
   
   const handleLoad = () => {
     const loaded = onLoad();
@@ -46,19 +48,37 @@ export default function StartScreen({ onStart, onLoad }: StartScreenProps) {
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
-            <input
-              type="text"
-              value={studioName}
-              onChange={(e) => setStudioName(e.target.value)}
-              placeholder="Enter studio name..."
-              className="px-4 py-3 w-64 bg-slate-800 text-white border-2 border-purple-500 rounded-lg focus:outline-none focus:border-purple-400"
-              autoFocus
-            />
+          <div className="space-y-4 max-w-md mx-auto">
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={founderName}
+                onChange={(e) => setFounderName(e.target.value)}
+                placeholder="Your name (founder)..."
+                className="px-4 py-3 w-full bg-slate-800 text-white border-2 border-purple-500 rounded-lg focus:outline-none focus:border-purple-400"
+                autoFocus
+              />
+              <input
+                type="text"
+                value={studioName}
+                onChange={(e) => setStudioName(e.target.value)}
+                placeholder="Studio name..."
+                className="px-4 py-3 w-full bg-slate-800 text-white border-2 border-purple-500 rounded-lg focus:outline-none focus:border-purple-400"
+              />
+              <label className="flex items-center gap-2 text-purple-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={skipTutorial}
+                  onChange={(e) => setSkipTutorial(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span>Skip tutorial</span>
+              </label>
+            </div>
             <div className="flex gap-4 justify-center">
               <button
-                onClick={() => studioName.trim() && onStart(studioName.trim())}
-                disabled={!studioName.trim()}
+                onClick={() => studioName.trim() && founderName.trim() && onStart(studioName.trim(), founderName.trim(), skipTutorial)}
+                disabled={!studioName.trim() || !founderName.trim()}
                 className="px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white font-bold rounded-lg transition-colors"
               >
                 START

@@ -19,7 +19,7 @@ export default function OfficeView({ studio, onNewProject, onContinueProject }: 
           <div>
             <h1 className="text-2xl font-bold text-purple-300 pixel-text">{studio.name}</h1>
             <div className="flex items-center gap-3 mt-1">
-              <p className="text-sm text-slate-400">{studio.officeTier.toUpperCase()} OFFICE</p>
+              <p className="text-sm text-slate-400">{studio.studioTier.toUpperCase()} OFFICE</p>
               <span className="text-xs px-2 py-0.5 bg-purple-600 rounded font-bold">LEVEL {studio.level}</span>
             </div>
           </div>

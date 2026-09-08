@@ -25,12 +25,16 @@ const TREND_NAMES = [
   'Elevated Genre', 'Anthology', 'Biopic Buzz', 'Space Opera'
 ];
 
-export function generateTalent(role: TalentRole, id: string): Talent {
+export function generateTalent(role: TalentRole, id: string, forceSkillRange?: { min: number; max: number }, forceFameRange?: { min: number; max: number }): Talent {
   const firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
   const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
   
-  const skill = Math.floor(Math.random() * 7) + 3; // 3-10
-  const fame = Math.floor(Math.random() * 10) + 1; // 1-10
+  // v2: Allow forced ranges for reputation-based talent gating
+  const skillRange = forceSkillRange || { min: 3, max: 10 };
+  const fameRange = forceFameRange || { min: 1, max: 10 };
+  
+  const skill = Math.floor(Math.random() * (skillRange.max - skillRange.min + 1)) + skillRange.min;
+  const fame = Math.floor(Math.random() * (fameRange.max - fameRange.min + 1)) + fameRange.min;
   
   const numTags = Math.floor(Math.random() * 3) + 1;
   const chemistryTags = Array.from(
@@ -139,4 +143,48 @@ export function calculateChemistry(talent1: Talent, talent2: Talent): number {
   });
   
   return Math.max(0, Math.min(100, score));
+}
+
+// v2: Talent gating by reputation
+export function generateFriendTalent(role: TalentRole, id: string): Talent {
+  // Friends are low-skill, low-fame, but cheap
+  return generateTalent(role, id, { min: 2, max: 4 }, { min: 1, max: 2 });
+}
+
+export function getAccessibleTalent(allTalent: Talent[], reputation: number): Talent[] {
+  // v2: Gate talent by reputation
+  // reputation 0-20: only friends (skill 2-4, fame 1-2)
+  // reputation 21-40: + low-mid tier (skill 3-6, fame 1-5)
+  // reputation 41-70: + mid-high tier (skill 5-8, fame 4-8)
+  // reputation 71+: everyone (skill 3-10, fame 1-10)
+  
+  return allTalent.filter(talent => {
+    const talentTier = talent.stats.skill + talent.stats.fame;
+    
+    if (reputation <= 20) {
+      // Only friends: skill 2-4, fame 1-2 (tier 3-6)
+      return talentTier <= 6;
+    } else if (reputation <= 40) {
+      // + low-mid: tier up to 11
+      return talentTier <= 11;
+    } else if (reputation <= 70) {
+      // + mid-high: tier up to 16
+      return talentTier <= 16;
+    }
+    
+    // All talent accessible
+    return true;
+  });
+}
+
+export function generateInitialFriendTalent(): Talent[] {
+  // v2: Generate 3-4 "friend" actors for the early game
+  const pool: Talent[] = [];
+  const count = Math.floor(Math.random() * 2) + 3; // 3-4 friends
+  
+  for (let i = 0; i < count; i++) {
+    pool.push(generateFriendTalent('Actor', `friend-${i}`));
+  }
+  
+  return pool;
 }

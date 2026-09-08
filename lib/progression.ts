@@ -1,6 +1,6 @@
 // Studio progression and unlock system
 
-import { Studio, StudioUnlocks, TalentRole } from './types';
+import { Studio, StudioUnlocks, TalentRole, StudioTierName } from './types';
 
 export function calculateStudioLevel(studio: Studio): number {
   // Level based on reputation, completed projects, and cash
@@ -11,7 +11,7 @@ export function calculateStudioLevel(studio: Studio): number {
   return Math.min(10, Math.floor((repPoints + projectPoints + cashPoints) / 3));
 }
 
-export function getUnlocksForLevel(level: number, officeTier: Studio['officeTier']): StudioUnlocks {
+export function getUnlocksForLevel(level: number, studioTier: StudioTierName): StudioUnlocks {
   const baseUnlocks: StudioUnlocks = {
     maxActors: 3,
     maxSupporting: 1,
@@ -59,13 +59,13 @@ export function getUnlocksForLevel(level: number, officeTier: Studio['officeTier
     baseUnlocks.festivalSubmissionUnlocked = true;
   }
   
-  // Office tier modifiers
-  if (officeTier === 'small') {
+  // Studio tier modifiers (v2: updated for new tier names)
+  if (studioTier === 'small-lot') {
     baseUnlocks.maxActors += 1;
-  } else if (officeTier === 'medium') {
+  } else if (studioTier === 'mid-studio') {
     baseUnlocks.maxActors += 2;
     baseUnlocks.maxSupporting += 1;
-  } else if (officeTier === 'large') {
+  } else if (studioTier === 'soundstage-campus') {
     baseUnlocks.maxActors += 3;
     baseUnlocks.maxSupporting += 2;
   }
@@ -73,15 +73,15 @@ export function getUnlocksForLevel(level: number, officeTier: Studio['officeTier
   return baseUnlocks;
 }
 
-export function canAffordOfficeUpgrade(studio: Studio): { canAfford: boolean; cost: number; nextTier: Studio['officeTier'] | null } {
-  const upgradeCosts: Record<Studio['officeTier'], { cost: number; next: Studio['officeTier'] | null }> = {
-    'garage': { cost: 150000, next: 'small' },
-    'small': { cost: 500000, next: 'medium' },
-    'medium': { cost: 1500000, next: 'large' },
-    'large': { cost: 0, next: null }
+export function canAffordOfficeUpgrade(studio: Studio): { canAfford: boolean; cost: number; nextTier: StudioTierName | null } {
+  const upgradeCosts: Record<StudioTierName, { cost: number; next: StudioTierName | null }> = {
+    'garage': { cost: 50000, next: 'small-lot' },
+    'small-lot': { cost: 150000, next: 'mid-studio' },
+    'mid-studio': { cost: 500000, next: 'soundstage-campus' },
+    'soundstage-campus': { cost: 0, next: null }
   };
   
-  const upgrade = upgradeCosts[studio.officeTier];
+  const upgrade = upgradeCosts[studio.studioTier];
   return {
     canAfford: studio.cash >= upgrade.cost,
     cost: upgrade.cost,

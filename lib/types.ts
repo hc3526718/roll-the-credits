@@ -6,6 +6,72 @@ export type BudgetTier = 'Micro' | 'Low' | 'Mid' | 'High';
 
 export type TalentRole = 'Actor' | 'Director' | 'Writer' | 'Cinematographer' | 'Editor' | 'Sound Designer' | 'VFX Artist' | 'Composer' | 'Producer';
 
+// v2: Calendar system
+export interface Calendar {
+  year: number;
+  month: number; // 1-12
+  week: number; // 1-4
+}
+
+// v2: Founder backstory
+export interface Founder {
+  name: string;
+  backstory: string; // VFX artist who couldn't break in
+}
+
+// v2: Studio tier progression
+export type StudioTierName = 'garage' | 'small-lot' | 'mid-studio' | 'soundstage-campus';
+
+export interface StudioTier {
+  name: StudioTierName;
+  displayName: string;
+  purchaseCost: number;
+  capacity: number; // max concurrent projects
+  departmentSlots: number; // max departments
+}
+
+// v2: Department system
+export type DepartmentType = 'edit-suite' | 'vfx-bay' | 'sound-stage' | 'marketing-office' | 'filming-stage';
+
+export interface Department {
+  id: string;
+  type: DepartmentType;
+  name: string;
+  owned: boolean;
+  purchaseCost: number;
+  rentalIncome: number; // per week when rented out
+  rented: boolean; // currently rented to external client
+  rentWeeksRemaining: number;
+  upgradeLevel: number; // 1-3
+  requiredForRoles: TalentRole[]; // roles that need this dept
+}
+
+// v2: Contract work
+export type ContractType = 'vfx-contract' | 'sound-contract' | 'editing-contract' | 'sfx-contract';
+
+export interface ContractJob {
+  id: string;
+  type: ContractType;
+  title: string;
+  description: string;
+  totalPayout: number;
+  durationWeeks: number;
+  weeksRemaining: number;
+  weeklyPayout: number;
+  requiredRoles: TalentRole[];
+  assignedEmployees: string[]; // Employee IDs
+  active: boolean;
+}
+
+// v2: Employee (extends Talent with leveling)
+export interface Employee extends Talent {
+  xp: number;
+  level: number;
+  employmentType: 'employee' | 'freelancer';
+  weeklyWage?: number; // for employees only
+  assignedTo?: string; // project or contract ID
+}
+
 export interface ChemistryTag {
   tag: string;
   compatible: string[];
@@ -180,18 +246,45 @@ export interface StudioUnlocks {
   advancedTrendsUnlocked: boolean;
 }
 
+// v2: Tutorial progress
+export type TutorialStep = 
+  | 'welcome'
+  | 'name-founder'
+  | 'explain-calendar'
+  | 'show-contracts'
+  | 'first-contract'
+  | 'explain-projects'
+  | 'first-project'
+  | 'scene-planner'
+  | 'release-results'
+  | 'complete';
+
+export interface TutorialProgress {
+  active: boolean;
+  currentStep: TutorialStep;
+  completedSteps: TutorialStep[];
+}
+
 export interface Studio {
   name: string;
+  founder: Founder; // v2
   cash: number;
+  debt: number; // v2: negative cash allowed
   reputation: number; // 0-100
-  officeTier: 'garage' | 'small' | 'medium' | 'large';
+  
+  calendar: Calendar; // v2
+  studioTier: StudioTierName; // v2: replaces officeTier
   level: number; // Studio level for progression
   
   audience: Audience;
   talentPool: Talent[];
+  employees: Employee[]; // v2: permanent staff
   trends: Trend[];
   unlocks: StudioUnlocks;
   activeEvents: IndustryEvent[];
+  
+  departments: Department[]; // v2
+  activeContracts: ContractJob[]; // v2
   
   currentProject?: Project;
   completedProjects: Project[];
@@ -202,5 +295,6 @@ export interface Studio {
 
 export interface GameState {
   studio: Studio;
+  tutorialProgress: TutorialProgress; // v2
   initialized: boolean;
 }

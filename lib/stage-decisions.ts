@@ -1,25 +1,61 @@
 // Stage-specific decision generation
 
-import { StageDecision, Project, ProductionPhase, Genre } from './types';
+import { StageDecision, Project, ProductionPhase, Genre, BudgetTier } from './types';
+
+// v2: Scale decision costs by project budget tier
+function getBudgetScaleFactor(budgetTier: BudgetTier): number {
+  const scales: Record<BudgetTier, number> = {
+    'Micro': 0.1,  // Micro budget: costs are 10% of base
+    'Low': 0.35,   // Low budget: costs are 35% of base
+    'Mid': 1.0,    // Mid budget: base costs
+    'High': 2.5    // High budget: costs are 2.5x base
+  };
+  return scales[budgetTier];
+}
+
+function scaleDecisionCosts(decision: StageDecision, scaleFactor: number): StageDecision {
+  return {
+    ...decision,
+    options: decision.options.map(option => ({
+      ...option,
+      cost: option.cost ? Math.floor(option.cost * scaleFactor) : 0
+    }))
+  };
+}
 
 export function generateStageDecision(stage: ProductionPhase, project: Project, progress: number): StageDecision | null {
   // Generate decision at 50% progress
   if (progress < 45 || progress > 55) return null;
   
+  let decision: StageDecision | null = null;
+  
   switch (stage) {
     case 'planning':
-      return generatePlanningDecision(project);
+      decision = generatePlanningDecision(project);
+      break;
     case 'preproduction':
-      return generatePreproductionDecision(project);
+      decision = generatePreproductionDecision(project);
+      break;
     case 'filming':
-      return generateFilmingDecision(project);
+      decision = generateFilmingDecision(project);
+      break;
     case 'postproduction':
-      return generatePostproductionDecision(project);
+      decision = generatePostproductionDecision(project);
+      break;
     case 'marketing':
-      return generateMarketingDecision(project);
+      decision = generateMarketingDecision(project);
+      break;
     default:
       return null;
   }
+  
+  // v2: Scale costs by budget tier
+  if (decision) {
+    const scaleFactor = getBudgetScaleFactor(project.budgetTier);
+    decision = scaleDecisionCosts(decision, scaleFactor);
+  }
+  
+  return decision;
 }
 
 function generatePlanningDecision(project: Project): StageDecision {
