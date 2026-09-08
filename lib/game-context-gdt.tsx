@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { GameState, Studio, Project, StaffMember, Contract, ResearchItem, FilmGenre, FilmTone, ProjectFormat } from './types-gdt';
 import { createFounder } from './staff-gdt';
 import { RESEARCH_TREE } from './research-tree';
@@ -18,7 +18,13 @@ interface GameContextType {
   updateProject: (projectId: string, updates: Partial<Project>) => void;
   completeProject: (projectId: string) => void;
   acceptContract: (contract: Contract) => void;
+  pauseTime: () => void;
+  resumeTime: () => void;
+  isPaused: boolean;
 }
+
+const TICK_DURATION_MS = 3000; // 3 seconds per tick
+const TICKS_PER_WEEK = 4;
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
@@ -41,6 +47,7 @@ function createInitialStudio(name: string, founderName: string): Studio {
       week: 1,
       totalWeeks: 0
     },
+    currentTick: 0,
     staff: [founder],
     researchTree: RESEARCH_TREE.map(r => ({ ...r, unlocked: false, completed: false, currentProgress: 0 })),
     activeResearch: null,
@@ -62,11 +69,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     tutorialComplete: false
   });
   
+  const [isPaused, setIsPaused] = useState(true); // Start paused (on title screen)
+  const tickTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
   useEffect(() => {
     // Try to load save on mount
     const loaded = loadGameFromStorage();
     if (loaded) {
       setState(loaded);
+      setIsPaused(false); // Resume time when loading game
     }
   }, []);
   
@@ -308,6 +319,66 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setTimeout(saveGame, 100);
   };
   
+  const pauseTime = () => {
+    setIsPaused(true);
+    if (tickTimerRef.current) {
+      clearTimeout(tickTimerRef.current);
+      tickTimerRef.current = null;
+    }
+  };
+  
+  const resumeTime = () => {
+    setIsPaused(false);
+  };
+  
+  // Auto-tick system: 4 ticks = 1 week
+  useEffect(() => {
+    if (!state.initialized || isPaused) {
+      return;
+    }
+    
+    const tick = () => {
+      setState(prev => {
+        const newTick = prev.studio.currentTick + 1;
+        
+        if (newTick >= TICKS_PER_WEEK) {
+          // Week complete, advance week
+          return prev; // advanceWeek will be called separately
+        }
+        
+        return {
+          ...prev,
+          studio: {
+            ...prev.studio,
+            currentTick: newTick
+          }
+        };
+      });
+    };
+    
+    tickTimerRef.current = setTimeout(tick, TICK_DURATION_MS);
+    
+    return () => {
+      if (tickTimerRef.current) {
+        clearTimeout(tickTimerRef.current);
+      }
+    };
+  }, [state.studio.currentTick, state.initialized, isPaused]);
+  
+  // Auto-advance week when 4 ticks complete
+  useEffect(() => {
+    if (state.studio.currentTick >= TICKS_PER_WEEK && !isPaused) {
+      advanceWeek();
+      setState(prev => ({
+        ...prev,
+        studio: {
+          ...prev.studio,
+          currentTick: 0
+        }
+      }));
+    }
+  }, [state.studio.currentTick, isPaused]);
+  
   return (
     <GameContext.Provider value={{
       state,
@@ -320,7 +391,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       addProject,
       updateProject,
       completeProject,
-      acceptContract
+      acceptContract,
+      pauseTime,
+      resumeTime,
+      isPaused
     }}>
       {children}
     </GameContext.Provider>

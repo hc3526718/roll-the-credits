@@ -206,6 +206,7 @@ export interface Studio {
   
   // Time
   calendar: GameCalendar;
+  currentTick: number; // 0-3, auto-advances every ~3 seconds
   
   // Staff
   staff: StaffMember[];

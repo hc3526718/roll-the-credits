@@ -1,7 +1,7 @@
 'use client';
 
 import { useGame } from '@/lib/game-context-gdt';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Project, PhaseAllocation, Contract } from '@/lib/types-gdt';
 import { calculateBudget, completeProject as calculateResults } from '@/lib/project-gdt';
 
@@ -60,7 +60,10 @@ export default function Home() {
     updateProject, 
     completeProject: completeProjectInStudio, 
     acceptContract, 
-    saveGame 
+    saveGame,
+    pauseTime,
+    resumeTime,
+    isPaused
   } = useGame();
   
   const [screen, setScreen] = useState<Screen>('title');
@@ -99,6 +102,15 @@ export default function Home() {
   
   const studio = state.studio;
   const currentProject = studio.activeProjects.find(p => p.id === currentProjectId);
+  
+  // Auto-pause/resume based on screen
+  useEffect(() => {
+    if (screen === 'office') {
+      resumeTime(); // Resume on office screen
+    } else if (screen !== 'title') {
+      pauseTime(); // Pause on all other screens
+    }
+  }, [screen]);
   
   // SETTINGS
   if (screen === 'settings') {
