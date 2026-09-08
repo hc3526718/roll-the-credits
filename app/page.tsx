@@ -2,20 +2,21 @@
 
 import { useGame } from '@/lib/game-context-gdt';
 import { useState } from 'react';
-import { Project, PhaseAllocation, StaffMember, Contract } from '@/lib/types-gdt';
-import { calculateBudget, completeProject as calculateResults, getPhaseTime } from '@/lib/project-gdt';
+import { Project, PhaseAllocation, Contract } from '@/lib/types-gdt';
+import { calculateBudget, completeProject as calculateResults } from '@/lib/project-gdt';
 
-// Screens
+// Replica Screens
 import TitleScreen from '@/components/gdt/TitleScreen';
 import OfficeView from '@/components/gdt/OfficeView';
+import SettingsPanel from '@/components/gdt/SettingsPanel';
 import NewProjectScreen from '@/components/gdt/NewProjectScreen';
-import PhaseDevScreen from '@/components/gdt/PhaseDevScreen';
-import HiringScreen from '@/components/gdt/HiringScreen';
-import ResearchScreen from '@/components/gdt/ResearchScreen';
-import ReleaseScreen from '@/components/gdt/ReleaseScreen';
-import ContractsBoard from '@/components/gdt/ContractsBoard';
+import PhaseDevScreenReplica from '@/components/gdt/PhaseDevScreenReplica';
+import HiringScreenReplica from '@/components/gdt/HiringScreenReplica';
+import ResearchScreenReplica from '@/components/gdt/ResearchScreenReplica';
+import ReleaseScreenReplica from '@/components/gdt/ReleaseScreenReplica';
+import ContractsBoardReplica from '@/components/gdt/ContractsBoardReplica';
 
-// Generate some contract offerings
+// Generate contract offerings
 function generateContracts(): Contract[] {
   const types: Array<'vfx-work' | 'edit-work' | 'sound-work' | 'consulting'> = ['vfx-work', 'edit-work', 'sound-work'];
   return types.map((type, i) => ({
@@ -39,6 +40,7 @@ function generateContracts(): Contract[] {
 type Screen = 
   | 'title'
   | 'office'
+  | 'settings'
   | 'new-project'
   | 'phase-dev'
   | 'hiring'
@@ -47,11 +49,24 @@ type Screen =
   | 'contracts';
 
 export default function Home() {
-  const { state, initializeGame, loadGame, updateStudio, advanceWeek, startResearch, addProject, updateProject, completeProject: completeProjectInStudio, acceptContract, saveGame } = useGame();
+  const { 
+    state, 
+    initializeGame, 
+    loadGame, 
+    updateStudio, 
+    advanceWeek, 
+    startResearch, 
+    addProject, 
+    updateProject, 
+    completeProject: completeProjectInStudio, 
+    acceptContract, 
+    saveGame 
+  } = useGame();
   
   const [screen, setScreen] = useState<Screen>('title');
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [availableContracts, setAvailableContracts] = useState<Contract[]>([]);
+  const [releaseResults, setReleaseResults] = useState<any>(null);
   
   if (!state.initialized) {
     return (
@@ -85,6 +100,21 @@ export default function Home() {
   const studio = state.studio;
   const currentProject = studio.activeProjects.find(p => p.id === currentProjectId);
   
+  // SETTINGS
+  if (screen === 'settings') {
+    return (
+      <SettingsPanel
+        onClose={() => setScreen('office')}
+        onReset={() => {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('roll-the-credits-gdt-save');
+          }
+          window.location.reload();
+        }}
+      />
+    );
+  }
+  
   // OFFICE VIEW
   if (screen === 'office') {
     return (
@@ -102,6 +132,7 @@ export default function Home() {
         onViewContracts={() => setScreen('contracts')}
         onViewResearch={() => setScreen('research')}
         onHireStaff={() => setScreen('hiring')}
+        onSettings={() => setScreen('settings')}
       />
     );
   }
@@ -113,17 +144,13 @@ export default function Home() {
         availableGenres={studio.unlockedGenres}
         availableTones={studio.unlockedTones}
         availableFormats={studio.unlockedFormats}
-        onConfirm={({ name, genre, tone, format, budgetTier }) => {
-          const budget = calculateBudget(budgetTier);
-          
+        onConfirm={(projectData) => {
+          const budget = calculateBudget(projectData.budgetTier);
           const project: Project = {
-            id: `project-${Date.now()}`,
-            name,
-            genre,
-            tone,
-            format,
-            budgetTier,
+            ...projectData,
             budget,
+            id: `project-${Date.now()}`,
+            assignedStaff: [],
             phaseState: {
               currentPhase: 'phase1',
               phase1Complete: false,
@@ -131,23 +158,28 @@ export default function Home() {
               phase3Complete: false,
               timeInCurrentPhase: 0,
               allocation: {
-                story: 50, script: 50, attachments: 50,
-                direction: 50, cinematography: 50, performance: 50,
-                editing: 50, soundVFX: 50, marketing: 50
+                story: 50,
+                script: 50,
+                attachments: 50,
+                direction: 50,
+                cinematography: 50,
+                performance: 50,
+                editing: 50,
+                soundVFX: 50,
+                marketing: 50
               }
             },
-            assignedStaff: studio.staff.map(s => s.id), // Assign all staff
             scenePlannerDone: false,
-            hype: 50,
-            expectedFans: 100,
+            scenePlannerQuality: 0,
+            hype: 0,
+            expectedFans: 0,
             released: false,
             createdAt: Date.now(),
             weeksElapsed: 0
           };
-          
           addProject(project);
-          updateStudio({ cash: studio.cash - budget });
           setCurrentProjectId(project.id);
+          saveGame();
           setScreen('phase-dev');
         }}
         onCancel={() => setScreen('office')}
@@ -158,107 +190,81 @@ export default function Home() {
   // PHASE DEVELOPMENT
   if (screen === 'phase-dev' && currentProject) {
     return (
-      <PhaseDevScreen
+      <PhaseDevScreenReplica
         project={currentProject}
         staff={studio.staff}
         onPhaseComplete={(allocation) => {
-          const phase = currentProject.phaseState.currentPhase;
-          const newAllocation = { ...currentProject.phaseState.allocation, ...allocation };
+          // Update project with new allocation
+          const updatedAllocation = { ...currentProject.phaseState.allocation, ...allocation };
+          updateProject(currentProject.id, { 
+            phaseState: { ...currentProject.phaseState, allocation: updatedAllocation }
+          });
           
-          // Mark phase complete and advance
-          if (phase === 'phase1') {
-            updateProject(currentProject.id, {
-              phaseState: {
-                ...currentProject.phaseState,
-                phase1Complete: true,
-                currentPhase: 'phase2',
-                allocation: newAllocation
-              },
-              weeksElapsed: currentProject.weeksElapsed + getPhaseTime('phase1', currentProject.budgetTier)
-            });
-            advanceWeek();
-          } else if (phase === 'phase2') {
-            updateProject(currentProject.id, {
-              phaseState: {
-                ...currentProject.phaseState,
-                phase2Complete: true,
-                currentPhase: 'phase3',
-                allocation: newAllocation
-              },
-              weeksElapsed: currentProject.weeksElapsed + getPhaseTime('phase2', currentProject.budgetTier)
-            });
-            advanceWeek();
-          } else if (phase === 'phase3') {
-            // Complete project - calculate results
-            const updatedProject = {
-              ...currentProject,
-              phaseState: {
-                ...currentProject.phaseState,
-                phase3Complete: true,
-                allocation: newAllocation
-              },
-              weeksElapsed: currentProject.weeksElapsed + getPhaseTime('phase3', currentProject.budgetTier)
+          if (currentProject.phaseState.currentPhase === 'phase3') {
+            // Complete project
+            const updatedProject = { 
+              ...currentProject, 
+              phaseState: { ...currentProject.phaseState, allocation: updatedAllocation, phase3Complete: true } 
             };
+            const results = calculateResults(
+              updatedProject,
+              studio.staff.filter(s => currentProject.assignedStaff.includes(s.id)),
+              studio.fans
+            );
             
-            const assignedStaff = studio.staff.filter(s => currentProject.assignedStaff.includes(s.id));
-            const results = calculateResults(updatedProject, assignedStaff, studio.fans);
-            
-            updateProject(currentProject.id, {
-              ...updatedProject,
-              released: true,
-              releaseDate: Date.now(),
-              results
-            });
-            
-            // Update studio
+            completeProjectInStudio(currentProject.id);
             updateStudio({
               cash: studio.cash + results.boxOffice,
               fans: studio.fans + results.fansGained,
-              reputation: Math.max(0, Math.min(100, studio.reputation + results.reputationChange))
+              reputation: Math.min(100, studio.reputation + results.reputationChange)
             });
-            
+            setReleaseResults({ ...results, projectName: currentProject.name, genre: currentProject.genre, tone: currentProject.tone });
+            saveGame();
             setScreen('release');
+          } else {
+            // Advance to next phase
+            const nextPhase = currentProject.phaseState.currentPhase === 'phase1' ? 'phase2' : 'phase3';
+            updateProject(currentProject.id, { 
+              phaseState: { 
+                ...currentProject.phaseState, 
+                currentPhase: nextPhase,
+                allocation: updatedAllocation,
+                phase1Complete: currentProject.phaseState.currentPhase === 'phase1',
+                phase2Complete: currentProject.phaseState.currentPhase === 'phase2'
+              }
+            });
+            saveGame();
           }
         }}
         onShowScenePlanner={() => {
-          // Simple scene planner - just mark as done with random quality
-          const quality = 60 + Math.random() * 30;
+          // Scene planner placeholder
           updateProject(currentProject.id, {
             scenePlannerDone: true,
-            scenePlannerQuality: quality
+            scenePlannerQuality: 70 + Math.random() * 20
           });
+          saveGame();
         }}
-      />
-    );
-  }
-  
-  // RELEASE
-  if (screen === 'release' && currentProject?.results) {
-    return (
-      <ReleaseScreen
-        projectName={currentProject.name}
-        results={currentProject.results}
-        onContinue={() => {
-          completeProjectInStudio(currentProject.id);
-          setCurrentProjectId(null);
-          setScreen('office');
-        }}
+        onBack={() => setScreen('office')}
       />
     );
   }
   
   // HIRING
   if (screen === 'hiring') {
-    const tierData = require('@/lib/office-tiers').OFFICE_TIERS[studio.officeTier];
+    const { OFFICE_TIERS } = require('@/lib/office-tiers');
+    const tierData = OFFICE_TIERS[studio.officeTier];
+    
     return (
-      <HiringScreen
+      <HiringScreenReplica
         currentStaff={studio.staff}
         maxStaff={tierData.maxStaff}
         cash={studio.cash}
         onHire={(newStaff) => {
-          updateStudio({
-            staff: [...studio.staff, newStaff]
+          updateStudio({ 
+            staff: [...studio.staff, newStaff],
+            cash: studio.cash - (newStaff.salary * 4)
           });
+          saveGame();
           setScreen('office');
         }}
         onClose={() => setScreen('office')}
@@ -268,36 +274,59 @@ export default function Home() {
   
   // RESEARCH
   if (screen === 'research') {
-    const tierData = require('@/lib/office-tiers').OFFICE_TIERS[studio.officeTier];
+    const { OFFICE_TIERS } = require('@/lib/office-tiers');
+    const tierData = OFFICE_TIERS[studio.officeTier];
+    
     return (
-      <ResearchScreen
+      <ResearchScreenReplica
         researchTree={studio.researchTree}
         activeResearch={studio.activeResearch}
         hasCreativeLab={tierData.hasCreativeLab}
+        officeTier={studio.officeTier}
         onStartResearch={(id) => {
           startResearch(id);
-          setScreen('office');
+          saveGame();
         }}
         onClose={() => setScreen('office')}
+      />
+    );
+  }
+  
+  // RELEASE
+  if (screen === 'release' && releaseResults) {
+    return (
+      <ReleaseScreenReplica
+        projectName={releaseResults.projectName}
+        genre={releaseResults.genre}
+        tone={releaseResults.tone}
+        results={releaseResults}
+        onContinue={() => {
+          setReleaseResults(null);
+          setCurrentProjectId(null);
+          setScreen('office');
+        }}
       />
     );
   }
   
   // CONTRACTS
   if (screen === 'contracts') {
+    const activeContracts = studio.activeContracts.filter(c => c.active);
+    const availableForAcceptance = availableContracts.filter(c => !c.active);
+    
     return (
-      <ContractsBoard
-        activeContracts={studio.activeContracts}
-        availableContracts={availableContracts.filter(c => !studio.activeContracts.find(ac => ac.id === c.id))}
+      <ContractsBoardReplica
+        activeContracts={activeContracts}
+        availableContracts={availableForAcceptance}
         onAccept={(contract) => {
           acceptContract(contract);
           setAvailableContracts(prev => prev.filter(c => c.id !== contract.id));
-          setScreen('office');
+          saveGame();
         }}
         onClose={() => setScreen('office')}
       />
     );
   }
   
-  return null;
+  return <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">Loading...</div>;
 }

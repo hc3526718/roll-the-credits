@@ -239,7 +239,9 @@ npm start
 
 ## 📦 Implementation Status
 
-### ✅ COMPLETE (GDT Core)
+### ✅ COMPLETE (Playable GDT Game)
+
+**Core Systems:**
 - Office tier progression with time/cash/staff gates
 - 3-phase development allocation system
 - Genre/tone combo ratings (great/good/neutral/poor)
@@ -248,7 +250,17 @@ npm start
 - Hype/fans/multi-critic reviews/box office over time
 - Budget-scaled phase times
 - Calendar (Y/M/W) with weekly progression
-- Contracts & debt (from v2)
+- Contracts & debt
+
+**Full UI:**
+- Title screen (New Game / Continue / Reset)
+- Office view (compact, fit on screen, all actions accessible)
+- New Project creation (genre+tone combo display)
+- 3-Phase Development (sliders for Script & Package, Production Craft, Finish & Sell)
+- Hiring screen (Design/Tech stats, salary, level display)
+- Research screen (available, in-progress, completed)
+- Release screen (multi-critic reviews, weekly box office graph)
+- Contracts board (accept, track active contracts)
 
 ### ✅ COMPLETE (Playable UI)
 - **Title screen** (New Game / Continue / Reset)
@@ -321,21 +333,87 @@ npm start
 
 ---
 
-## 📖 How to Play (Current MVP)
+## 📖 How to Play (Full Playable Loop)
 
-1. **New Game** → Name founder (VFX artist) & studio
-2. **Office View** shows:
-   - Cash, Fans, Reputation
-   - Calendar (Year/Month/Week)
-   - Staff list (Design/Tech/Speed/Research stats)
-   - Active projects
-   - Research status
-3. **Advance Week** (future UI) → Income from contracts, research progresses
-4. **Projects** (future UI) → 3-phase development with sliders
-5. **Research** (future UI) → Unlock genres/tones/features
-6. **Office Upgrade** (future UI) → Hit cash/time/staff gates
+### Starting a New Game
 
-**Current state**: Core systems implemented, minimal UI to demonstrate GDT spine. Full UI in next iteration.
+1. **New Game** → Enter founder name (VFX artist) & studio name
+2. **Office View** appears with:
+   - Cash: $25K starting
+   - Fans: 100
+   - Reputation: 10
+   - Calendar: Y2024 M1 W1
+   - Staff: Your founder (VFX Artist)
+   - Starting genres: Action, Drama, Thriller
+   - Starting tones: Gritty, Serious, Modern, Classic
+
+### First Steps (Survival Path)
+
+1. **Accept Contracts** (💼 Contracts button)
+   - VFX work, Edit work, Sound work
+   - 2-3 weeks duration
+   - $3-6K/week income
+   - Keeps cash flowing while building
+
+2. **Advance Week** (⏭ button)
+   - Contracts pay out
+   - Research progresses
+   - Staff salaries deducted
+   - Calendar advances
+
+3. **Start Your First Project** (🎬 New Project)
+   - Choose genre + tone (check combo rating!)
+   - Micro budget ($10K) recommended
+   - Action + Gritty = Great combo (+20 audience, +15 quality)
+
+### 3-Phase Development
+
+**Phase 1: Script & Package**
+- Adjust sliders: Story, Script, Attachments
+- See estimated quality update live
+- Complete phase (advances time)
+
+**Phase 2: Production Craft**
+- Adjust sliders: Direction, Cinematography, Performance
+- **Scene Planner** available (optional quality boost)
+- Complete phase
+
+**Phase 3: Finish & Sell**
+- Adjust sliders: Editing, Sound/VFX, Marketing
+- Complete phase → Release!
+
+### Release Results
+
+- **5 critic reviews** (Film Critic Weekly, Cinema Review, etc.)
+- **Average critic score**
+- **Fan score**
+- **Box office revenue** (opens strong, decays over 12 weeks)
+- **Fans gained** (based on quality + hype + budget)
+- **Reputation change** (+5 for 80+, -5 for <20)
+
+### Growth Loop
+
+1. **Complete projects** → Earn cash & reputation
+2. **Advance weeks** → Research progresses, contracts pay
+3. **Start Research** (🔬 Research button)
+   - Unlock Comedy, Horror, Sci-Fi, Fantasy genres
+   - Unlock Marketing, Sequels, Festivals features
+4. **Hire Staff** (👥 Hire Staff)
+   - Writers, Directors, Editors, VFX Artists, Producers
+   - Design/Tech stats matter for quality
+   - Weekly salaries
+5. **Upgrade Office** → Hit gates (e.g., $250K for First Studio)
+   - First Studio: Hire up to 5 staff, research begins
+   - Upgraded Studio: Specialization unlocked
+   - Large Lot: Creative Lab for advanced research
+
+### Office Tier Milestones
+
+- **Garage** (start): 1 staff, 1 project, no research
+- **First Studio** ($250K): 5 staff, 2 projects, research begins
+- **Upgraded Studio** ($1M + 2 years + 4 staff): 10 staff, 3 projects, specialization
+- **Large Lot** ($5M + 5 years + 8 staff): 20 staff, 5 projects, Creative Lab
+- **Empire** ($20M + 10 years + 15 staff): 50 staff, 10 projects, streaming/distribution
 
 ---
 
