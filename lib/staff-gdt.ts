@@ -37,64 +37,87 @@ export function generateStaffMember(role: StaffRole, id: string): StaffMember {
   
   usedNames.add(fullName);
   
-  // Role determines stat tendencies
-  let design = Math.floor(Math.random() * 6) + 3; // 3-8 base
-  let tech = Math.floor(Math.random() * 6) + 3;
+  // Owner Design attributes (3-8 base)
+  let craft = Math.floor(Math.random() * 6) + 3;
+  let taste = Math.floor(Math.random() * 6) + 3;
   let speed = Math.floor(Math.random() * 6) + 3;
-  let research = Math.floor(Math.random() * 5) + 2; // 2-6
+  let reliability = Math.floor(Math.random() * 6) + 3;
+  let network = Math.floor(Math.random() * 5) + 2; // 2-6
+  let rep = Math.floor(Math.random() * 5) + 2;
+  let research = Math.floor(Math.random() * 5) + 2;
   
   // Role bonuses
-  if (role === 'writer') {
-    design += 2; // Writers are design-focused
-  } else if (role === 'director') {
-    design += 1;
-    tech += 1; // Directors need both
+  if (role === 'writer' || role === 'director') {
+    taste += 2; // Creative roles
+    craft += 1;
   } else if (role === 'editor' || role === 'vfx-artist') {
-    tech += 2; // Technical roles
+    craft += 2; // Technical roles
+    taste += 1;
   } else if (role === 'producer') {
-    research += 2; // Producers are good at research/planning
+    network += 2;
+    reliability += 1;
+    research += 2;
   }
   
   // Cap at 10
-  design = Math.min(10, design);
-  tech = Math.min(10, tech);
+  craft = Math.min(10, craft);
+  taste = Math.min(10, taste);
   speed = Math.min(10, speed);
+  reliability = Math.min(10, reliability);
+  network = Math.min(10, network);
+  rep = Math.min(10, rep);
   research = Math.min(10, research);
   
-  // Salary based on stats
-  const avgStat = (design + tech + speed + research) / 4;
-  const baseSalary = 500;
-  const salary = Math.round(baseSalary + (avgStat * 100));
+  // Legacy GDT stats
+  const design = Math.floor((craft + taste) / 2);
+  const tech = craft;
+  
+  // Cost based on stats and rep
+  const avgStat = (craft + taste + speed + reliability + network + rep) / 6;
+  const baseCost = 500;
+  const cost = Math.round(baseCost + (avgStat * 150) + (rep * 200));
   
   return {
     id,
     name: fullName,
     role,
+    craft,
+    taste,
+    speed,
+    reliability,
+    network,
+    rep,
+    cost,
     design,
     tech,
-    speed,
     research,
     level: 1,
     xp: 0,
-    salary,
+    salary: cost,
     busy: false,
     burnout: 0
   };
 }
 
 export function createFounder(name: string): StaffMember {
-  // Founder is a VFX artist (tech-focused)
+  // Founder is a VFX artist (craft-focused per Owner Design)
   return {
     id: 'founder',
     name,
     role: 'founder',
-    design: 5,
-    tech: 7, // VFX background
-    speed: 6,
+    craft: 7,        // VFX artist = strong craft
+    taste: 5,        // Decent creative sense
+    speed: 6,        // Good pace
+    reliability: 8,  // Founder is committed
+    network: 3,      // Just starting out
+    rep: 2,          // Unknown
+    cost: 0,         // Founder doesn't take salary
+    design: 6,       // Legacy: (craft + taste) / 2
+    tech: 7,         // Legacy: = craft
     research: 5,
     level: 1,
     xp: 0,
-    salary: 0, // Founder doesn't take salary
+    salary: 0,
     busy: false,
     burnout: 0
   };

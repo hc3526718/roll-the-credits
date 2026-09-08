@@ -2,7 +2,7 @@
 
 import { useGame } from '@/lib/game-context-gdt';
 import { useState, useEffect } from 'react';
-import { Project, PhaseAllocation, Contract } from '@/lib/types-gdt';
+import { Project, PhaseAllocation, Contract, DevelopmentStage } from '@/lib/types-gdt';
 import { calculateBudget, completeProject as calculateResults } from '@/lib/project-gdt';
 
 // Replica Screens
@@ -10,7 +10,7 @@ import TitleScreen from '@/components/gdt/TitleScreen';
 import OfficeView from '@/components/gdt/OfficeView';
 import SettingsPanel from '@/components/gdt/SettingsPanel';
 import NewProjectScreen from '@/components/gdt/NewProjectScreen';
-import PhaseDevScreenReplica from '@/components/gdt/PhaseDevScreenReplica';
+import PhaseDevScreen5Stage from '@/components/gdt/PhaseDevScreen5Stage';
 import HiringScreenReplica from '@/components/gdt/HiringScreenReplica';
 import ResearchScreenReplica from '@/components/gdt/ResearchScreenReplica';
 import ReleaseScreenReplica from '@/components/gdt/ReleaseScreenReplica';
@@ -166,6 +166,7 @@ export default function Home() {
   if (screen === 'new-project') {
     return (
       <NewProjectScreen
+        availableTopics={studio.unlockedTopics}
         availableGenres={studio.unlockedGenres}
         availableTones={studio.unlockedTones}
         availableFormats={studio.unlockedFormats}
@@ -177,21 +178,34 @@ export default function Home() {
             id: `project-${Date.now()}`,
             assignedStaff: [],
             phaseState: {
-              currentPhase: 'phase1',
-              phase1Complete: false,
-              phase2Complete: false,
-              phase3Complete: false,
-              timeInCurrentPhase: 0,
+              currentStage: 'planning',
+              planningComplete: false,
+              recruitmentComplete: false,
+              filmingComplete: false,
+              postComplete: false,
+              marketingComplete: false,
+              timeInCurrentStage: 0,
               allocation: {
-                story: 50,
-                script: 50,
-                attachments: 50,
-                direction: 50,
-                cinematography: 50,
-                performance: 50,
-                editing: 50,
-                soundVFX: 50,
-                marketing: 50
+                // Planning (100-pt pool)
+                scriptStory: 34,
+                storyboardPreviz: 33,
+                budgetSchedule: 33,
+                // Recruitment (100-pt pool)
+                casting: 34,
+                crew: 33,
+                locations: 33,
+                // Filming (100-pt pool)
+                cinematography: 34,
+                performance: 33,
+                productionDesign: 33,
+                // Post (100-pt pool)
+                editing: 34,
+                soundScore: 33,
+                vfxGrade: 33,
+                // Marketing (100-pt pool)
+                trailerCampaign: 34,
+                press: 33,
+                distributionRelease: 33
               }
             },
             scenePlannerDone: false,
@@ -215,7 +229,7 @@ export default function Home() {
   // PHASE DEVELOPMENT
   if (screen === 'phase-dev' && currentProject) {
     return (
-      <PhaseDevScreenReplica
+      <PhaseDevScreen5Stage
         project={currentProject}
         staff={studio.staff}
         onPhaseComplete={(allocation) => {
@@ -225,11 +239,13 @@ export default function Home() {
             phaseState: { ...currentProject.phaseState, allocation: updatedAllocation }
           });
           
-          if (currentProject.phaseState.currentPhase === 'phase3') {
-            // Complete project
+          const currentStage = currentProject.phaseState.currentStage;
+          
+          if (currentStage === 'marketing') {
+            // Complete project (final stage)
             const updatedProject = { 
               ...currentProject, 
-              phaseState: { ...currentProject.phaseState, allocation: updatedAllocation, phase3Complete: true } 
+              phaseState: { ...currentProject.phaseState, allocation: updatedAllocation, marketingComplete: true } 
             };
             const results = calculateResults(
               updatedProject,
@@ -247,15 +263,20 @@ export default function Home() {
             saveGame();
             setScreen('release');
           } else {
-            // Advance to next phase
-            const nextPhase = currentProject.phaseState.currentPhase === 'phase1' ? 'phase2' : 'phase3';
+            // Advance to next stage
+            const stageOrder: DevelopmentStage[] = ['planning', 'recruitment', 'filming', 'post', 'marketing'];
+            const currentIndex = stageOrder.indexOf(currentStage);
+            const nextStage = stageOrder[currentIndex + 1];
+            
             updateProject(currentProject.id, { 
               phaseState: { 
                 ...currentProject.phaseState, 
-                currentPhase: nextPhase,
+                currentStage: nextStage,
                 allocation: updatedAllocation,
-                phase1Complete: currentProject.phaseState.currentPhase === 'phase1',
-                phase2Complete: currentProject.phaseState.currentPhase === 'phase2'
+                planningComplete: currentStage === 'planning' || currentProject.phaseState.planningComplete,
+                recruitmentComplete: currentStage === 'recruitment' || currentProject.phaseState.recruitmentComplete,
+                filmingComplete: currentStage === 'filming' || currentProject.phaseState.filmingComplete,
+                postComplete: currentStage === 'post' || currentProject.phaseState.postComplete
               }
             });
             saveGame();

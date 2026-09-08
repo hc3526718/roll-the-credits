@@ -54,10 +54,11 @@ function createInitialStudio(name: string, founderName: string): Studio {
     activeProjects: [],
     completedProjects: [],
     activeContracts: [],
-    // Starting unlocks (basic genres/tones only)
-    unlockedGenres: ['Action', 'Drama', 'Thriller'],
-    unlockedTones: ['Gritty', 'Serious', 'Modern', 'Classic'],
-    unlockedFormats: ['Short', 'Feature'],
+    // Starting unlocks (Owner Design early formats)
+    unlockedTopics: ['Technology', 'Relationships', 'Urban-Life'],
+    unlockedGenres: ['Action', 'Drama', 'Comedy'],
+    unlockedTones: ['Serious', 'Modern', 'Gritty'],
+    unlockedFormats: ['Social-Video', 'Short-Film', 'Music-Video'],
     unlockedFeatures: new Set()
   };
 }

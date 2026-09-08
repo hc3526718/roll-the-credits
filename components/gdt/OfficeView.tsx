@@ -109,7 +109,7 @@ export default function OfficeView({
                       className="w-full text-left p-2 bg-green-900/30 hover:bg-green-900/50 rounded text-xs mb-1"
                     >
                       <p className="font-bold truncate">{proj.name}</p>
-                      <p className="text-green-300 text-[10px]">Phase {proj.phaseState.currentPhase}</p>
+                      <p className="text-green-300 text-[10px]">Stage: {proj.phaseState.currentStage}</p>
                     </button>
                   ))}
                 </div>

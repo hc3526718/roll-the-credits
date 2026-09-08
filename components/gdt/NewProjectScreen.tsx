@@ -1,16 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { FilmGenre, FilmTone, ProjectFormat, BudgetTier } from '@/lib/types-gdt';
+import { FilmGenre, FilmTone, ProjectFormat, BudgetTier, ProjectTopic } from '@/lib/types-gdt';
 import { getComboRating, getComboDescription } from '@/lib/genre-combos';
 import { calculateBudget } from '@/lib/project-gdt';
 
 interface NewProjectScreenProps {
+  availableTopics: ProjectTopic[];
   availableGenres: FilmGenre[];
   availableTones: FilmTone[];
   availableFormats: ProjectFormat[];
   onConfirm: (data: {
     name: string;
+    topic: ProjectTopic;
     genre: FilmGenre;
     tone: FilmTone;
     format: ProjectFormat;
@@ -20,6 +22,7 @@ interface NewProjectScreenProps {
 }
 
 export default function NewProjectScreen({
+  availableTopics,
   availableGenres,
   availableTones,
   availableFormats,
@@ -27,6 +30,7 @@ export default function NewProjectScreen({
   onCancel
 }: NewProjectScreenProps) {
   const [name, setName] = useState('');
+  const [topic, setTopic] = useState<ProjectTopic>(availableTopics[0]);
   const [genre, setGenre] = useState<FilmGenre>(availableGenres[0]);
   const [tone, setTone] = useState<FilmTone>(availableTones[0]);
   const [format, setFormat] = useState<ProjectFormat>(availableFormats[0]);
@@ -57,7 +61,20 @@ export default function NewProjectScreen({
               </div>
               
               <div>
-                <label className="block text-sm mb-2 text-slate-300">Genre</label>
+                <label className="block text-sm mb-2 text-slate-300">Topic (What)</label>
+                <select
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value as ProjectTopic)}
+                  className="w-full px-4 py-2 bg-slate-900 text-white border-2 border-purple-500 rounded"
+                >
+                  {availableTopics.map(t => (
+                    <option key={t} value={t}>{t.replace('-', ' ')}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm mb-2 text-slate-300">Genre (How)</label>
                 <select
                   value={genre}
                   onChange={(e) => setGenre(e.target.value as FilmGenre)}
@@ -70,7 +87,7 @@ export default function NewProjectScreen({
               </div>
               
               <div>
-                <label className="block text-sm mb-2 text-slate-300">Tone</label>
+                <label className="block text-sm mb-2 text-slate-300">Tone (Feel)</label>
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value as FilmTone)}
@@ -142,7 +159,7 @@ export default function NewProjectScreen({
             <button
               onClick={() => {
                 if (name.trim()) {
-                  onConfirm({ name: name.trim(), genre, tone, format, budgetTier });
+                  onConfirm({ name: name.trim(), topic, genre, tone, format, budgetTier });
                 }
               }}
               disabled={!name.trim()}

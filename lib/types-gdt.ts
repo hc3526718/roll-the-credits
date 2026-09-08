@@ -41,38 +41,69 @@ export interface GenreTopping {
   unlocked: boolean;
 }
 
-// ===== PROJECT FORMAT =====
-export type ProjectFormat = 'Short' | 'Feature' | 'Limited-Series' | 'Franchise-Film';
+// ===== PROJECT FORMAT (Owner Design early formats) =====
+export type ProjectFormat = 
+  | 'Social-Video'      // Early: Short-form social content
+  | 'Short-Film'        // Early: Traditional short film
+  | 'Music-Video'       // Early: Music video production
+  | 'Commercial'        // Early: Advertising content
+  | 'Micro-Doc'         // Early: Short documentary
+  | 'Feature'           // Unlock later
+  | 'Limited-Series'    // Unlock later
+  | 'Franchise-Film';   // Unlock later
+
 export type BudgetTier = 'Micro' | 'Low' | 'Medium' | 'High' | 'Blockbuster';
 
-// ===== 3-PHASE DEVELOPMENT (GDT-style sliders) =====
-export type DevelopmentPhase = 'phase1' | 'phase2' | 'phase3';
+// ===== PROJECT TOPIC (Owner Design: hidden combos) =====
+export type ProjectTopic = 
+  | 'Technology' | 'Nature' | 'Urban-Life' | 'Relationships' | 'Adventure'
+  | 'Mystery' | 'History' | 'Future' | 'Art' | 'Sports';
 
-export interface PhaseAllocation {
-  // Phase 1: Script & Package
-  story: number; // 0-100
-  script: number;
-  attachments: number; // casting/director attachment
+// ===== 5-STAGE DEVELOPMENT (Owner Design) =====
+export type DevelopmentStage = 'planning' | 'recruitment' | 'filming' | 'post' | 'marketing';
+
+export interface StageAllocation {
+  // Planning (3 sliders, 100-pt pool)
+  scriptStory: number;
+  storyboardPreviz: number;
+  budgetSchedule: number;
   
-  // Phase 2: Production Craft
-  direction: number;
+  // Recruitment (3 sliders, 100-pt pool)
+  casting: number;
+  crew: number;
+  locations: number;
+  
+  // Filming (3 sliders, 100-pt pool)
   cinematography: number;
   performance: number;
+  productionDesign: number;
   
-  // Phase 3: Finish & Sell
+  // Post (3 sliders, 100-pt pool)
   editing: number;
-  soundVFX: number;
-  marketing: number;
+  soundScore: number;
+  vfxGrade: number;
+  
+  // Marketing (3 sliders, 100-pt pool)
+  trailerCampaign: number;
+  press: number;
+  distributionRelease: number;
 }
 
-export interface ProjectPhaseState {
-  currentPhase: DevelopmentPhase;
-  phase1Complete: boolean;
-  phase2Complete: boolean;
-  phase3Complete: boolean;
-  timeInCurrentPhase: number; // weeks
-  allocation: PhaseAllocation;
+export interface ProjectStageState {
+  currentStage: DevelopmentStage;
+  planningComplete: boolean;
+  recruitmentComplete: boolean;
+  filmingComplete: boolean;
+  postComplete: boolean;
+  marketingComplete: boolean;
+  timeInCurrentStage: number;
+  allocation: StageAllocation;
 }
+
+// Legacy aliases for backward compatibility during migration
+export type DevelopmentPhase = DevelopmentStage;
+export type PhaseAllocation = StageAllocation;
+export type ProjectPhaseState = ProjectStageState;
 
 // ===== RESEARCH TREE (GDT-style) =====
 export type ResearchCategory = 
@@ -108,15 +139,23 @@ export interface StaffMember {
   name: string;
   role: StaffRole;
   
-  // GDT-style stats
-  design: number; // Story/Art (1-10)
-  tech: number; // Craft/VFX/Edit (1-10)
-  speed: number; // Work speed (1-10)
-  research: number; // Research contribution (1-10)
+  // Owner Design attributes
+  craft: number;        // Technical skill (1-10)
+  taste: number;        // Creative sense (1-10)
+  speed: number;        // Work speed (1-10)
+  reliability: number;  // Consistency (1-10)
+  network: number;      // Connections (1-10)
+  rep: number;          // Reputation (1-10)
+  cost: number;         // Salary/rate
+  
+  // Legacy GDT stats (for compatibility)
+  design: number;       // Story/Art (maps to taste)
+  tech: number;         // Craft/VFX (maps to craft)
+  research: number;     // Research contribution (1-10)
   
   level: number; // 1-5
   xp: number;
-  salary: number; // Per week
+  salary: number; // Per week (alias for cost)
   
   // State
   busy: boolean;
@@ -132,16 +171,17 @@ export interface Project {
   id: string;
   name: string;
   format: ProjectFormat;
+  topic: ProjectTopic;  // Owner Design: Topic × Genre combos
   genre: FilmGenre;
   tone: FilmTone;
   budgetTier: BudgetTier;
   budget: number;
   
   // Development state
-  phaseState: ProjectPhaseState;
+  phaseState: ProjectPhaseState; // Using legacy alias
   assignedStaff: string[]; // Staff IDs
   
-  // Scene planner integration (ONE beat in phase 2/3)
+  // Scene planner integration (ONE beat in filming stage)
   scenePlannerDone: boolean;
   scenePlannerQuality?: number; // 0-100
   
@@ -223,6 +263,7 @@ export interface Studio {
   activeContracts: Contract[];
   
   // Unlocks (from research)
+  unlockedTopics: ProjectTopic[];   // Owner Design
   unlockedGenres: FilmGenre[];
   unlockedTones: FilmTone[];
   unlockedFormats: ProjectFormat[];
