@@ -71,6 +71,17 @@ export default function Home() {
   const [availableContracts, setAvailableContracts] = useState<Contract[]>([]);
   const [releaseResults, setReleaseResults] = useState<any>(null);
   
+  // Auto-redirect to office when game loads from save
+  useEffect(() => {
+    if (state.initialized && screen === 'title') {
+      // Game was loaded from save, transition to office
+      setScreen('office');
+      if (availableContracts.length === 0) {
+        setAvailableContracts(generateContracts());
+      }
+    }
+  }, [state.initialized, screen, availableContracts.length]);
+  
   // Auto-pause/resume based on screen - MUST be before any returns
   useEffect(() => {
     if (!state.initialized) return; // Safe early exit inside effect
@@ -342,5 +353,32 @@ export default function Home() {
     );
   }
   
-  return <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">Loading...</div>;
+  // Fallback: should never reach here, but if we do, show title screen
+  console.error('Unexpected screen state:', screen, 'initialized:', state.initialized);
+  return (
+    <TitleScreen
+      onNewGame={(studioName, founderName) => {
+        initializeGame(studioName, founderName);
+        setAvailableContracts(generateContracts());
+        setScreen('office');
+      }}
+      onContinue={() => {
+        const loaded = loadGame();
+        if (loaded) {
+          if (availableContracts.length === 0) {
+            setAvailableContracts(generateContracts());
+          }
+          setScreen('office');
+          return true;
+        }
+        return false;
+      }}
+      onReset={() => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('roll-the-credits-gdt-save');
+        }
+        window.location.reload();
+      }}
+    />
+  );
 }

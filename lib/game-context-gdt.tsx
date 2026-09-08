@@ -72,17 +72,51 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [isPaused, setIsPaused] = useState(true); // Start paused (on title screen)
   const tickTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasTriedLoadRef = useRef(false);
+  const failsafeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Load save on mount - run once only
   useEffect(() => {
     if (hasTriedLoadRef.current) return;
     hasTriedLoadRef.current = true;
     
+    // Failsafe: if not initialized within 2 seconds, force to title screen
+    failsafeTimeoutRef.current = setTimeout(() => {
+      setState(prev => {
+        if (!prev.initialized) {
+          console.warn('Failsafe triggered: forcing initialized=true after timeout');
+          // Clear any corrupt save
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.removeItem(STORAGE_KEY);
+            } catch (e) {
+              // Ignore
+            }
+          }
+          return {
+            ...prev,
+            initialized: false // Keep false to show title screen
+          };
+        }
+        return prev;
+      });
+    }, 2000);
+    
     try {
       const loaded = loadGameFromStorage();
       if (loaded) {
         setState(loaded);
         setIsPaused(false); // Resume time when loading game
+        // Cancel failsafe since load succeeded
+        if (failsafeTimeoutRef.current) {
+          clearTimeout(failsafeTimeoutRef.current);
+          failsafeTimeoutRef.current = null;
+        }
+      } else {
+        // No save found, cancel failsafe (title will show via initialized=false)
+        if (failsafeTimeoutRef.current) {
+          clearTimeout(failsafeTimeoutRef.current);
+          failsafeTimeoutRef.current = null;
+        }
       }
     } catch (error) {
       console.error('Failed to load game on mount:', error);
@@ -94,7 +128,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
           // Ignore cleanup errors
         }
       }
+      // Cancel failsafe
+      if (failsafeTimeoutRef.current) {
+        clearTimeout(failsafeTimeoutRef.current);
+        failsafeTimeoutRef.current = null;
+      }
     }
+    
+    return () => {
+      if (failsafeTimeoutRef.current) {
+        clearTimeout(failsafeTimeoutRef.current);
+      }
+    };
   }, []);
   
   const loadGameFromStorage = (): GameState | null => {
