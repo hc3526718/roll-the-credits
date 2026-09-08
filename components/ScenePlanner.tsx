@@ -116,7 +116,7 @@ export default function ScenePlanner({ talent, existingScenes, onConfirm, onBack
                     className="flex-shrink-0 w-64 bg-slate-700 rounded-lg p-4 border-2 border-slate-600"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => {
-                      if (draggedTalent && scene.characters.length < 3) {
+                      if (draggedTalent && scene.characters.length < 6) {
                         addCharacter(scene.position, draggedTalent);
                         setDraggedTalent(null);
                       }
@@ -144,10 +144,10 @@ export default function ScenePlanner({ talent, existingScenes, onConfirm, onBack
                       ))}
                     </select>
                     
-                    <div className="min-h-[120px] bg-slate-800 rounded-lg p-3 space-y-2">
+                    <div className="min-h-[120px] max-h-[180px] overflow-y-auto bg-slate-800 rounded-lg p-3 space-y-2">
                       {sceneTalent.length === 0 && (
                         <p className="text-xs text-slate-500 text-center py-8">
-                          Drop actors here
+                          Drop actors here (up to 6)
                         </p>
                       )}
                       {sceneTalent.map(t => (
@@ -155,7 +155,7 @@ export default function ScenePlanner({ talent, existingScenes, onConfirm, onBack
                           key={t.id}
                           className="flex items-center justify-between bg-slate-700 rounded px-2 py-1"
                         >
-                          <span className="text-xs font-bold">{t.name.split(' ')[0]}</span>
+                          <span className="text-xs font-bold">{t.name}</span>
                           <button
                             onClick={() => removeCharacter(scene.position, t.id)}
                             className="text-red-400 hover:text-red-300 text-xs"
@@ -164,6 +164,11 @@ export default function ScenePlanner({ talent, existingScenes, onConfirm, onBack
                           </button>
                         </div>
                       ))}
+                      {sceneTalent.length > 0 && (
+                        <p className="text-[10px] text-slate-600 text-center">
+                          {sceneTalent.length}/6 actors
+                        </p>
+                      )}
                     </div>
                     
                     {chemistryInfo && (
@@ -236,11 +241,12 @@ export default function ScenePlanner({ talent, existingScenes, onConfirm, onBack
           <div className="mt-4 p-3 bg-purple-900/20 border border-purple-600 rounded-lg text-sm text-purple-200">
             <p className="font-bold mb-1">💡 Scene Planning Tips:</p>
             <ul className="text-xs space-y-1 text-purple-300">
-              <li>• Drag actors into scenes (up to 3 per scene)</li>
+              <li>• Drag actors into scenes (up to 6 per scene)</li>
               <li>• High chemistry (70+) = quality boost & audience appeal</li>
               <li>• Low chemistry (30-) = quality penalty</li>
               <li>• Scene 1 sets the tone - use your best talent!</li>
               <li>• Matching chemistry tags create better pairings</li>
+              <li>• Actors can appear in multiple scenes</li>
             </ul>
           </div>
           

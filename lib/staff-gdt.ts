@@ -4,17 +4,38 @@ import { StaffMember, StaffRole } from './types-gdt';
 
 const FIRST_NAMES = [
   'Alex', 'Morgan', 'Jordan', 'Casey', 'Riley', 'Quinn', 'Avery', 'Blake',
-  'Charlie', 'Dakota', 'Ellis', 'Finley', 'Harper', 'Jamie', 'Kai', 'Logan'
+  'Charlie', 'Dakota', 'Ellis', 'Finley', 'Harper', 'Jamie', 'Kai', 'Logan',
+  'Taylor', 'Cameron', 'Reese', 'Sage', 'River', 'Phoenix', 'Rowan', 'Skylar'
 ];
 
 const LAST_NAMES = [
   'Chen', 'Martinez', 'Okafor', 'Patel', 'Silva', 'Kim', 'Johnson', 'Garcia',
-  'Williams', 'Brown', 'Davis', 'Miller', 'Lee', 'Thompson', 'White', 'Harris'
+  'Williams', 'Brown', 'Davis', 'Miller', 'Lee', 'Thompson', 'White', 'Harris',
+  'Rodriguez', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'Martin'
 ];
 
+// Track used names to ensure uniqueness
+const usedNames = new Set<string>();
+
 export function generateStaffMember(role: StaffRole, id: string): StaffMember {
-  const firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
-  const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+  let firstName, lastName, fullName;
+  let attempts = 0;
+  
+  // Generate unique name (try up to 100 times)
+  do {
+    firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+    lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+    fullName = `${firstName} ${lastName}`;
+    attempts++;
+    
+    // Fallback: append number if we can't find unique combination
+    if (attempts > 100) {
+      fullName = `${firstName} ${lastName} ${Math.floor(Math.random() * 999)}`;
+      break;
+    }
+  } while (usedNames.has(fullName));
+  
+  usedNames.add(fullName);
   
   // Role determines stat tendencies
   let design = Math.floor(Math.random() * 6) + 3; // 3-8 base
@@ -47,7 +68,7 @@ export function generateStaffMember(role: StaffRole, id: string): StaffMember {
   
   return {
     id,
-    name: `${firstName} ${lastName}`,
+    name: fullName,
     role,
     design,
     tech,

@@ -5,13 +5,15 @@ import { Talent, TalentRole, Trend, Genre, ChemistryTag } from './types';
 const FIRST_NAMES = [
   'Alex', 'Morgan', 'Jordan', 'Casey', 'Riley', 'Quinn', 'Avery', 'Blake',
   'Charlie', 'Dakota', 'Ellis', 'Finley', 'Harper', 'Indigo', 'Jamie', 'Kai',
-  'Logan', 'Marley', 'Nico', 'Parker', 'Reese', 'Sage', 'Taylor', 'Val'
+  'Logan', 'Marley', 'Nico', 'Parker', 'Reese', 'Sage', 'Taylor', 'Val',
+  'Cameron', 'Drew', 'Emerson', 'Frankie', 'Gray', 'Haven'
 ];
 
 const LAST_NAMES = [
   'Chen', 'Martinez', 'Okafor', 'Patel', 'Silva', 'Kim', 'Johnson', 'Garcia',
   'Williams', 'Brown', 'Davis', 'Miller', 'Rodriguez', 'Lee', 'Thompson', 'White',
-  'Harris', 'Martin', 'Jackson', 'Clark', 'Lewis', 'Walker', 'Hall', 'Young'
+  'Harris', 'Martin', 'Jackson', 'Clark', 'Lewis', 'Walker', 'Hall', 'Young',
+  'Allen', 'King', 'Wright', 'Lopez', 'Hill', 'Scott'
 ];
 
 const CHEMISTRY_TAGS = [
@@ -25,9 +27,28 @@ const TREND_NAMES = [
   'Elevated Genre', 'Anthology', 'Biopic Buzz', 'Space Opera'
 ];
 
+// Track used talent names for uniqueness
+const usedTalentNames = new Set<string>();
+
 export function generateTalent(role: TalentRole, id: string, forceSkillRange?: { min: number; max: number }, forceFameRange?: { min: number; max: number }): Talent {
-  const firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
-  const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+  let firstName, lastName, fullName;
+  let attempts = 0;
+  
+  // Ensure unique name
+  do {
+    firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+    lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+    fullName = `${firstName} ${lastName}`;
+    attempts++;
+    
+    if (attempts > 100) {
+      // Fallback with number suffix
+      fullName = `${firstName} ${lastName} ${Math.floor(Math.random() * 999)}`;
+      break;
+    }
+  } while (usedTalentNames.has(fullName));
+  
+  usedTalentNames.add(fullName);
   
   // v2: Allow forced ranges for reputation-based talent gating
   const skillRange = forceSkillRange || { min: 3, max: 10 };
@@ -58,7 +79,7 @@ export function generateTalent(role: TalentRole, id: string, forceSkillRange?: {
   
   return {
     id,
-    name: `${firstName} ${lastName}`,
+    name: fullName,
     role,
     stats: {
       skill,
