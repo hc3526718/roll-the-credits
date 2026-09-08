@@ -2,166 +2,302 @@
 
 import { useGame } from '@/lib/game-context-gdt';
 import { useState } from 'react';
+import { Project, PhaseAllocation, StaffMember, Contract } from '@/lib/types-gdt';
+import { calculateBudget, completeProject as calculateResults, getPhaseTime } from '@/lib/project-gdt';
 
-// Minimal MVP - just to get building
+// Screens
+import TitleScreen from '@/components/gdt/TitleScreen';
+import OfficeView from '@/components/gdt/OfficeView';
+import NewProjectScreen from '@/components/gdt/NewProjectScreen';
+import PhaseDevScreen from '@/components/gdt/PhaseDevScreen';
+import HiringScreen from '@/components/gdt/HiringScreen';
+import ResearchScreen from '@/components/gdt/ResearchScreen';
+import ReleaseScreen from '@/components/gdt/ReleaseScreen';
+import ContractsBoard from '@/components/gdt/ContractsBoard';
+
+// Generate some contract offerings
+function generateContracts(): Contract[] {
+  const types: Array<'vfx-work' | 'edit-work' | 'sound-work' | 'consulting'> = ['vfx-work', 'edit-work', 'sound-work'];
+  return types.map((type, i) => ({
+    id: `contract-${Date.now()}-${i}`,
+    type,
+    title: type === 'vfx-work' ? 'VFX for Commercial' : 
+           type === 'edit-work' ? 'Edit Web Series' :
+           'Sound Design for Podcast',
+    description: `Short-term ${type.replace('-', ' ')} gig for extra income.`,
+    totalPayout: 6000 + Math.random() * 6000,
+    durationWeeks: 2 + Math.floor(Math.random() * 2),
+    weeksRemaining: 2,
+    weeklyPayout: 3000,
+    active: false
+  })).map(c => ({
+    ...c,
+    weeklyPayout: Math.floor(c.totalPayout / c.durationWeeks)
+  }));
+}
+
+type Screen = 
+  | 'title'
+  | 'office'
+  | 'new-project'
+  | 'phase-dev'
+  | 'hiring'
+  | 'research'
+  | 'release'
+  | 'contracts';
+
 export default function Home() {
-  const { state, initializeGame, loadGame } = useGame();
-  const [studioName, setStudioName] = useState('');
-  const [founderName, setFounderName] = useState('');
-  const [showNewGame, setShowNewGame] = useState(false);
+  const { state, initializeGame, loadGame, updateStudio, advanceWeek, startResearch, addProject, updateProject, completeProject: completeProjectInStudio, acceptContract, saveGame } = useGame();
+  
+  const [screen, setScreen] = useState<Screen>('title');
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [availableContracts, setAvailableContracts] = useState<Contract[]>([]);
   
   if (!state.initialized) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
-        <div className="text-center space-y-8 p-8">
-          <h1 className="text-6xl font-bold pixel-text">ROLL THE CREDITS</h1>
-          <p className="text-xl text-slate-400">GDT Edition - Film Studio Tycoon</p>
-          
-          {!showNewGame ? (
-            <div className="space-y-4">
-              <button
-                onClick={() => setShowNewGame(true)}
-                className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg w-64 pixel-border"
-              >
-                NEW GAME
-              </button>
-              <button
-                onClick={() => {
-                  const loaded = loadGame();
-                  if (!loaded) alert('No saved game found!');
-                }}
-                className="px-8 py-4 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-lg w-64 pixel-border"
-              >
-                LOAD GAME
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <input
-                type="text"
-                value={founderName}
-                onChange={(e) => setFounderName(e.target.value)}
-                placeholder="Your name (VFX artist founder)..."
-                className="px-4 py-3 w-96 bg-slate-800 text-white border-2 border-purple-500 rounded-lg"
-                autoFocus
-              />
-              <input
-                type="text"
-                value={studioName}
-                onChange={(e) => setStudioName(e.target.value)}
-                placeholder="Studio name..."
-                className="px-4 py-3 w-96 bg-slate-800 text-white border-2 border-purple-500 rounded-lg"
-              />
-              <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => {
-                    if (studioName.trim() && founderName.trim()) {
-                      initializeGame(studioName.trim(), founderName.trim());
-                    }
-                  }}
-                  disabled={!studioName.trim() || !founderName.trim()}
-                  className="px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white font-bold rounded-lg"
-                >
-                  START
-                </button>
-                <button
-                  onClick={() => setShowNewGame(false)}
-                  className="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-lg"
-                >
-                  BACK
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <TitleScreen
+        onNewGame={(studioName, founderName) => {
+          initializeGame(studioName, founderName);
+          setAvailableContracts(generateContracts());
+          setScreen('office');
+        }}
+        onContinue={() => {
+          const loaded = loadGame();
+          if (loaded) {
+            if (availableContracts.length === 0) {
+              setAvailableContracts(generateContracts());
+            }
+            setScreen('office');
+            return true;
+          }
+          return false;
+        }}
+        onReset={() => {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('roll-the-credits-gdt-save');
+          }
+          window.location.reload();
+        }}
+      />
     );
   }
   
   const studio = state.studio;
+  const currentProject = studio.activeProjects.find(p => p.id === currentProjectId);
   
-  // Simple office view
-  return (
-    <div className="min-h-screen bg-slate-900 text-white">
-      {/* Top bar */}
-      <div className="bg-slate-800 border-b-2 border-purple-600 p-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold pixel-text">{studio.name}</h1>
-            <p className="text-sm text-slate-400">
-              {studio.officeTier.toUpperCase()} • Y{studio.calendar.year} M{studio.calendar.month} W{studio.calendar.week}
-            </p>
-          </div>
-          <div className="flex gap-8">
-            <div>
-              <p className="text-xs text-slate-400">CASH</p>
-              <p className="text-xl font-bold text-green-400">${studio.cash.toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">FANS</p>
-              <p className="text-xl font-bold text-blue-400">{studio.fans.toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">REP</p>
-              <p className="text-xl font-bold text-purple-400">{studio.reputation}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Main content */}
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="bg-slate-800 pixel-border p-6 rounded">
-          <h2 className="text-3xl font-bold mb-4 pixel-text">Office - {studio.officeTier.replace(/-/g, ' ')}</h2>
+  // OFFICE VIEW
+  if (screen === 'office') {
+    return (
+      <OfficeView
+        studio={studio}
+        onNewProject={() => setScreen('new-project')}
+        onContinueProject={(id) => {
+          setCurrentProjectId(id);
+          setScreen('phase-dev');
+        }}
+        onAdvanceWeek={() => {
+          advanceWeek();
+          saveGame();
+        }}
+        onViewContracts={() => setScreen('contracts')}
+        onViewResearch={() => setScreen('research')}
+        onHireStaff={() => setScreen('hiring')}
+      />
+    );
+  }
+  
+  // NEW PROJECT
+  if (screen === 'new-project') {
+    return (
+      <NewProjectScreen
+        availableGenres={studio.unlockedGenres}
+        availableTones={studio.unlockedTones}
+        availableFormats={studio.unlockedFormats}
+        onConfirm={({ name, genre, tone, format, budgetTier }) => {
+          const budget = calculateBudget(budgetTier);
           
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-xl mb-2">Staff</h3>
-              <div className="space-y-2">
-                {studio.staff.map(s => (
-                  <div key={s.id} className="bg-slate-700 p-3 rounded">
-                    <p className="font-bold">{s.name} - {s.role}</p>
-                    <p className="text-sm text-slate-400">
-                      Design: {s.design} | Tech: {s.tech} | Speed: {s.speed} | Research: {s.research} | Lvl {s.level}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+          const project: Project = {
+            id: `project-${Date.now()}`,
+            name,
+            genre,
+            tone,
+            format,
+            budgetTier,
+            budget,
+            phaseState: {
+              currentPhase: 'phase1',
+              phase1Complete: false,
+              phase2Complete: false,
+              phase3Complete: false,
+              timeInCurrentPhase: 0,
+              allocation: {
+                story: 50, script: 50, attachments: 50,
+                direction: 50, cinematography: 50, performance: 50,
+                editing: 50, soundVFX: 50, marketing: 50
+              }
+            },
+            assignedStaff: studio.staff.map(s => s.id), // Assign all staff
+            scenePlannerDone: false,
+            hype: 50,
+            expectedFans: 100,
+            released: false,
+            createdAt: Date.now(),
+            weeksElapsed: 0
+          };
+          
+          addProject(project);
+          updateStudio({ cash: studio.cash - budget });
+          setCurrentProjectId(project.id);
+          setScreen('phase-dev');
+        }}
+        onCancel={() => setScreen('office')}
+      />
+    );
+  }
+  
+  // PHASE DEVELOPMENT
+  if (screen === 'phase-dev' && currentProject) {
+    return (
+      <PhaseDevScreen
+        project={currentProject}
+        staff={studio.staff}
+        onPhaseComplete={(allocation) => {
+          const phase = currentProject.phaseState.currentPhase;
+          const newAllocation = { ...currentProject.phaseState.allocation, ...allocation };
+          
+          // Mark phase complete and advance
+          if (phase === 'phase1') {
+            updateProject(currentProject.id, {
+              phaseState: {
+                ...currentProject.phaseState,
+                phase1Complete: true,
+                currentPhase: 'phase2',
+                allocation: newAllocation
+              },
+              weeksElapsed: currentProject.weeksElapsed + getPhaseTime('phase1', currentProject.budgetTier)
+            });
+            advanceWeek();
+          } else if (phase === 'phase2') {
+            updateProject(currentProject.id, {
+              phaseState: {
+                ...currentProject.phaseState,
+                phase2Complete: true,
+                currentPhase: 'phase3',
+                allocation: newAllocation
+              },
+              weeksElapsed: currentProject.weeksElapsed + getPhaseTime('phase2', currentProject.budgetTier)
+            });
+            advanceWeek();
+          } else if (phase === 'phase3') {
+            // Complete project - calculate results
+            const updatedProject = {
+              ...currentProject,
+              phaseState: {
+                ...currentProject.phaseState,
+                phase3Complete: true,
+                allocation: newAllocation
+              },
+              weeksElapsed: currentProject.weeksElapsed + getPhaseTime('phase3', currentProject.budgetTier)
+            };
             
-            <div>
-              <h3 className="text-xl mb-2">Active Projects</h3>
-              {studio.activeProjects.length === 0 ? (
-                <p className="text-slate-400">No active projects</p>
-              ) : (
-                <div className="space-y-2">
-                  {studio.activeProjects.map(p => (
-                    <div key={p.id} className="bg-slate-700 p-3 rounded">
-                      <p className="font-bold">{p.name}</p>
-                      <p className="text-sm">{p.genre} • {p.tone} • {p.format}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            const assignedStaff = studio.staff.filter(s => currentProject.assignedStaff.includes(s.id));
+            const results = calculateResults(updatedProject, assignedStaff, studio.fans);
             
-            <div>
-              <h3 className="text-xl mb-2">Research</h3>
-              {studio.activeResearch ? (
-                <p className="text-green-400">Researching: {studio.researchTree.find(r => r.id === studio.activeResearch)?.name}</p>
-              ) : (
-                <p className="text-slate-400">No active research</p>
-              )}
-            </div>
+            updateProject(currentProject.id, {
+              ...updatedProject,
+              released: true,
+              releaseDate: Date.now(),
+              results
+            });
             
-            <div>
-              <p className="text-sm text-slate-500 mt-8">
-                GDT spine MVP - Core systems implemented. Full UI coming next iteration.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+            // Update studio
+            updateStudio({
+              cash: studio.cash + results.boxOffice,
+              fans: studio.fans + results.fansGained,
+              reputation: Math.max(0, Math.min(100, studio.reputation + results.reputationChange))
+            });
+            
+            setScreen('release');
+          }
+        }}
+        onShowScenePlanner={() => {
+          // Simple scene planner - just mark as done with random quality
+          const quality = 60 + Math.random() * 30;
+          updateProject(currentProject.id, {
+            scenePlannerDone: true,
+            scenePlannerQuality: quality
+          });
+        }}
+      />
+    );
+  }
+  
+  // RELEASE
+  if (screen === 'release' && currentProject?.results) {
+    return (
+      <ReleaseScreen
+        projectName={currentProject.name}
+        results={currentProject.results}
+        onContinue={() => {
+          completeProjectInStudio(currentProject.id);
+          setCurrentProjectId(null);
+          setScreen('office');
+        }}
+      />
+    );
+  }
+  
+  // HIRING
+  if (screen === 'hiring') {
+    const tierData = require('@/lib/office-tiers').OFFICE_TIERS[studio.officeTier];
+    return (
+      <HiringScreen
+        currentStaff={studio.staff}
+        maxStaff={tierData.maxStaff}
+        cash={studio.cash}
+        onHire={(newStaff) => {
+          updateStudio({
+            staff: [...studio.staff, newStaff]
+          });
+          setScreen('office');
+        }}
+        onClose={() => setScreen('office')}
+      />
+    );
+  }
+  
+  // RESEARCH
+  if (screen === 'research') {
+    const tierData = require('@/lib/office-tiers').OFFICE_TIERS[studio.officeTier];
+    return (
+      <ResearchScreen
+        researchTree={studio.researchTree}
+        activeResearch={studio.activeResearch}
+        hasCreativeLab={tierData.hasCreativeLab}
+        onStartResearch={(id) => {
+          startResearch(id);
+          setScreen('office');
+        }}
+        onClose={() => setScreen('office')}
+      />
+    );
+  }
+  
+  // CONTRACTS
+  if (screen === 'contracts') {
+    return (
+      <ContractsBoard
+        activeContracts={studio.activeContracts}
+        availableContracts={availableContracts.filter(c => !studio.activeContracts.find(ac => ac.id === c.id))}
+        onAccept={(contract) => {
+          acceptContract(contract);
+          setAvailableContracts(prev => prev.filter(c => c.id !== contract.id));
+          setScreen('office');
+        }}
+        onClose={() => setScreen('office')}
+      />
+    );
+  }
+  
+  return null;
 }

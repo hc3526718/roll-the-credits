@@ -1,268 +1,222 @@
-# Roll the Credits v2.0
+# Roll the Credits - GDT Spine Rebuild
 
-A creative studio tycoon game that combines **Game Dev Tycoon** management, **creator sim** mechanics, and **Storyteller's** scene-planning puzzle system.
-
-Build your film studio from a garage startup to a soundstage campus, managing contracts, talent, and ambitious film projects.
+**Film studio tycoon rebuilt on the Game Dev Tycoon spine.**
 
 ---
 
-## 🚀 What's New in v2.0
+## 🎯 CORE GDT MAPPING
 
-### 🎓 Tutorial & Origin Story
-- Play as a **VFX artist** who couldn't break into the big studios
-- Interactive tutorial guides you through:
-  - Calendar & time management
-  - Contract work for survival income
-  - Your first micro-budget film with friends
-  - Scene planning mechanics
-  - Release & reputation building
+This is a **complete architectural rebuild** focusing on the proven Game Dev Tycoon formula adapted for film production. The v2 hybrid approach has been replaced with a coherent GDT-like core.
 
-### 📅 Time Progression (GDT-style)
-- **Persistent calendar** (Year/Month/Week)
-- Projects consume real calendar weeks per stage
-- Idle office: advance week-by-week
-- Recurring income from contracts & department rentals
-- Plan your schedule carefully!
+### Meta Progression (Office Tiers)
 
-### 💼 Contract Work Economy
-Take on **VFX, sound, editing, or SFX gigs** from other agencies:
-- Timed jobs that pay weekly (2-3 week durations)
-- Perfect for survival income between films
-- Build your reputation while keeping the lights on
-- VFX contracts leveraging your founder's background
+**5-Tier progression with time + cash + staff gates:**
 
-### 🏢 Studio Tier Progression
-Upgrade your studio from humble beginnings to a full campus:
+1. **Garage** - Solo founder (VFX artist), learn combos, take contracts
+   - Unlock: Start
+   - Max staff: 1
+   - Max projects: 1
+   - No research
 
-1. **Garage** (Starting tier)
-   - 1 concurrent project
-   - 2 department slots
-   - Your founder's VFX skills
+2. **First Studio** - Hire first employees, medium projects, research begins
+   - Unlock: $250K cash
+   - Max staff: 5
+   - Max projects: 2
+   - Research speed: 1.0x
 
-2. **Small Lot** ($50,000)
-   - 2 concurrent projects
-   - 4 department slots
-   - More professional space
+3. **Upgraded Studio** - Specialization unlocks, more capacity
+   - Unlock: $1M cash + 2 years (104 weeks) + 4 staff
+   - Max staff: 10
+   - Max projects: 3
+   - Research speed: 1.5x
 
-3. **Mid Studio** ($150,000)
-   - 3 concurrent projects
-   - 6 department slots
-   - Industry credibility
+4. **Large Studio Lot** - Creative Lab for advanced research
+   - Unlock: $5M cash + 5 years (260 weeks) + 8 staff
+   - Max staff: 20
+   - Max projects: 5
+   - Research speed: 2.0x
+   - **Creative Lab unlocked**
 
-4. **Soundstage Campus** ($500,000)
-   - 5 concurrent projects
-   - 10 department slots
-   - Full production empire
-
-### 🏭 Department System
-Purchase and manage departments:
-- **Editing Suite** ($15K) - Required for Editors
-- **VFX Bay** ($25K) - Required for VFX Artists
-- **Sound Stage** ($20K) - Required for Sound & Composers
-- **Marketing Office** ($10K) - Required for Producers
-- **Filming Stage** ($35K) - Required for filming
-
-**Rent them out** when idle for weekly income:
-- Editing Suite: $800/week
-- VFX Bay: $1,200/week
-- Sound Stage: $1,000/week
-- Marketing Office: $600/week
-- Filming Stage: $1,500/week
-
-### 👥 Employee System
-- Hire **permanent employees** with weekly wages
-- Employees **level up** through projects (XP system)
-- Higher levels = better skills (capped at 10)
-- Track who's busy vs available
-- Or hire **freelancers** per-project (no weekly cost)
-
-### 💰 Debt & Budget Risk
-- Projects can **go over budget**
-- Negative cash = debt tracking
-- **Soft warnings** before risky decisions
-- Recover through:
-  - Contract work
-  - Department rentals
-  - Box office hits
-- No hard blocks (except catastrophic situations)
-
-### 🎭 Talent Gating by Reputation
-Start with **friends** and unlock better talent:
-
-- **Rep 0-20**: Only friends (skill 2-4, fame 1-2)
-  - Cheap actors for micro-budget films
-  - Your initial circle
-
-- **Rep 21-40**: + Low-mid tier talent
-  - Expanding pool as word spreads
-
-- **Rep 41-70**: + Mid-high tier professionals
-  - Established industry talent
-
-- **Rep 71+**: Everyone accessible
-  - Top-tier actors & crew
-
-### 💵 Budget-Scaled Decisions
-**CRITICAL**: Event/decision costs scale with project budget tier:
-
-- **Micro budget** (~$10K film): Events cost hundreds, max ~$1K
-- **Low budget** (~$50K film): Events scaled to 35% of base
-- **Mid budget** (~$200K film): Base event costs (100%)
-- **High budget** (~$1M+ film): Events scaled to 250% of base
-
-No more "$50K shock on a $10K film" — costs always make sense!
-
-### 🖥️ Compact UI (1280×800 friendly)
-Redesigned office view:
-- **Tabbed interface** (Overview / Projects / Studio)
-- All critical info fits in viewport
-- Minimal scrolling on desktop
-- Quick actions always visible
-- Calendar, cash, debt, rep at a glance
+5. **Entertainment Empire** - Late-game distribution/streaming
+   - Unlock: $20M cash + 10 years (520 weeks) + 15 staff
+   - Max staff: 50
+   - Max projects: 10
+   - Research speed: 3.0x
 
 ---
 
-## 🎮 Core Gameplay Loop
+## 🎬 3-Phase Development System
 
-### Early Game Path (Tutorial Recommended)
+Every project goes through **3 phases with allocation sliders** (GDT-style):
 
-1. **Name your founder & studio**
-2. **Accept your first contract** (VFX work)
-   - Earns weekly income for 2-3 weeks
-   - Builds initial cash reserve
-3. **Start micro-budget film with friends**
-   - Only friend-tier actors available (cheap but low skill)
-   - Go through 5 production stages
-   - Scene planner: arrange cast for story outcomes
-4. **Release & build reputation**
-   - Audience/critic scores
-   - Gain followers & reputation
-5. **Unlock better talent & roles**
-   - Higher rep = access to skilled professionals
-6. **Upgrade studio tier**
-   - Purchase departments
-   - Rent them out for passive income
-7. **Bigger budgets, better projects**
-   - Mid-tier films with experienced cast
-   - Complex production decisions
-8. **Build your empire**
-   - Multiple concurrent projects
-   - Full soundstage campus
-   - Top-tier talent
+### Phase 1: Script & Package
+- **Story** (0-100)
+- **Script** (0-100)
+- **Attachments** (casting/director) (0-100)
+- **Contributors**: Writer (Design stat), Director (Design)
 
----
+### Phase 2: Production Craft
+- **Direction** (0-100)
+- **Cinematography** (0-100)
+- **Performance** (acting) (0-100)
+- **Contributors**: Director (Design/Tech), Scene Planner bonus
+- **Special Beat**: Scene planner (Storyteller-inspired) as ONE compact puzzle
 
-## 🎬 5-Stage Production Pipeline
+### Phase 3: Finish & Sell
+- **Editing** (0-100)
+- **Sound/VFX** (0-100)
+- **Marketing** (0-100)
+- **Contributors**: Editor (Tech), VFX Artist (Tech), Producer (Design)
 
-Every project goes through:
-
-### 1. Planning & Development (8 weeks)
-- Hire: **Writer, Director**
-- Script development approach
-- Source material decisions (original vs IP vs public domain)
-- **Decisions**:
-  - Deep character work vs fast draft
-  - License hot IP vs create original
-  - Script quality determines foundation
-
-### 2. Pre-Production (6 weeks)
-- Hire: **Cinematographer, Actors**
-- Production schedule planning
-- Location scouting vs VFX planning
-- **Decisions**:
-  - Practical effects vs VFX-heavy
-  - Premium locations vs compressed schedule
-  - Cinematography quality locked in
-
-### 3. Filming / Principal Photography (10 weeks)
-- **Scene Planner** (Storyteller-inspired)
-  - Arrange actors in 3-5 panels
-  - Characters can appear in multiple scenes
-  - Pairings + order = story outcomes
-- **Decisions**:
-  - On-set challenges (overtime, reshoot, move on)
-  - Actor conflicts (replace, accommodate, trust director)
-
-### 4. Post-Production (8 weeks)
-- Hire: **Editor, Sound Designer, VFX Artist**
-- Post-production focus area
-- **Decisions**:
-  - More VFX shots vs premium sound vs extra edit time
-  - Balancing quality across departments
-  - Sound, VFX, editing quality finalized
-
-### 5. Marketing & Distribution (6 weeks)
-- Marketing campaign strategy
-- **Decisions**:
-  - Festival premiere (prestige, slower)
-  - Viral campaign (social media, memes)
-  - Traditional (TV spots, press junket)
-  - Limited platform release (word-of-mouth)
-- Marketing reach determines audience multiplier
-
-**Total: 38+ weeks** from concept to release.
+**Time per phase scales with budget tier:**
+- Micro: 0.5x time
+- Low: 0.75x
+- Medium: 1.0x (6, 10, 8 weeks)
+- High: 1.5x
+- Blockbuster: 2.0x
 
 ---
 
-## 🎯 Roles & Their Impact
+## 🧬 Genre/Tone Combo System
 
-| Role | Stage(s) | Quality Weight | Notes |
-|------|----------|---------------|-------|
-| 🎭 **Actor** | Filming | Varies | Scene chemistry & pairings matter |
-| 🎬 **Director** | All | 30% | Oversees entire production |
-| ✍️ **Writer** | Planning | 20% | Script quality foundation |
-| 📷 **Cinematographer** | Pre-prod | 15% | Visual style |
-| ✂️ **Editor** | Post | 15% | Pacing & flow |
-| 🔊 **Sound Designer** | Post | 10% | Audio immersion |
-| ✨ **VFX Artist** | Post | 10% | Visual effects |
-| 🎵 **Composer** | Post | Optional | Music score |
-| 📋 **Producer** | Marketing | Optional | Marketing reach |
+Like GDT's genre-topic system, **combos matter**:
 
----
+- **Great pairings**: +15-20 quality, +15-20 audience (e.g., Action+Gritty, Comedy+Whimsical)
+- **Good pairings**: +10-15 quality/audience
+- **Neutral**: No effect
+- **Poor pairings**: -10 to -20 (e.g., Comedy+Gritty, Horror+Uplifting)
 
-## 🏆 Progression Systems
+**Starting unlocks (Garage)**:
+- Genres: Action, Drama, Thriller
+- Tones: Gritty, Serious, Modern, Classic
 
-### Studio Level
-Based on: `(Reputation/10 + Projects Completed + Cash/50K) / 3`
-
-- **Level 1-2**: Writer unlocks, 4 max actors
-- **Level 3-4**: Cinematographer, Editor, test screenings
-- **Level 5-6**: Sound Designer, Composer, VFX Artist, Marketing
-- **Level 7+**: Producer, festivals, 8 max actors
-
-### Unlockables
-- New roles at higher levels
-- More actor slots
-- Marketing features
-- Test screenings
-- Festival submissions
-- Advanced trend analysis
-
-### Studio Tier Bonuses
-- **Small Lot**: +1 max actors
-- **Mid Studio**: +2 max actors, +1 supporting
-- **Soundstage Campus**: +3 max actors, +2 supporting
+**Research unlocks more** (Comedy, Horror, Romance, Sci-Fi, Fantasy, Documentary, Musical + more tones).
 
 ---
 
-## 🎨 Art Style
+## 🔬 Research Tree
 
-**Cozy pixel/office aesthetic** inspired by Game Dev Tycoon:
-- CSS/SVG/Canvas procedural art
-- Clean, readable UI
-- Pixel borders & text styling
-- No AI-generated assets
-- Office floor visualization
+Time-gated unlocks like GDT:
+
+### Early Research (First Studio)
+- Target Audience (80 pts)
+- Marketing Basics (100 pts)
+- Comedy, Horror, Romance genres (60-80 pts each)
+
+### Mid-Tier Research
+- Limited Series format (120 pts, requires Target Audience)
+- Sequels & Franchises (150 pts, requires Marketing)
+- Sci-Fi, Fantasy genres (140-150 pts)
+- Documentary (100 pts)
+- Festival Circuit (180 pts)
+- Genre-Bending / Multi-Genre (200 pts)
+
+### Creative Lab Research (Large Lot required)
+- Virtual Production (300 pts)
+- Advanced VFX Pipeline (350 pts)
+- Streaming Platforms (250 pts)
+- Musical genre (280 pts)
+
+**Research progress**: Staff contribute `research stat × office research speed` per week.
 
 ---
 
-## 🛠️ Tech Stack
+## 👥 Staff System (Design/Tech Split)
 
-- **Next.js 16** (App Router)
-- **TypeScript**
-- **React** (client-heavy)
-- **localStorage** for save/load persistence
-- **Tailwind CSS** + custom pixel styling
+**GDT-style stats**:
+- **Design**: Story/Art (1-10) - Writers, Directors, Producers
+- **Tech**: Craft/VFX/Edit (1-10) - Editors, VFX Artists
+- **Speed**: Work speed (1-10)
+- **Research**: Research contribution (1-10)
+
+**Roles**:
+- Founder (VFX Artist background: Tech 7, Design 5)
+- Writer (Design-focused)
+- Director (Design + Tech)
+- Editor (Tech-focused)
+- VFX Artist (Tech-focused)
+- Producer (Research-focused)
+
+**Progression**:
+- Level 1-5 (XP from completing projects)
+- Level up = stat boosts
+- **Specialization** at Level 3+ (Upgraded Studio): Story, Visuals, Sound, Marketing, Research (+2 to relevant stat)
+
+**Burnout**: 0-100, increases with work, decreases 2/week idle. At 80+, staff needs vacation.
+
+**Weekly salary**: Based on average stats (~$500-1500/week).
+
+---
+
+## 📊 Hype, Reviews, Box Office
+
+**Not instant!** Like GDT:
+
+### Pre-Release
+- **Hype**: 0-100 (builds during development/marketing)
+- **Expected fans**: Preview metric
+
+### Post-Release
+- **5 critic outlets** review your film (variance + quality + hype)
+- **Average critic score**: Aggregated
+- **Fan score**: Quality-weighted + hype
+- **Box office**: Opens strong, decays 70%/week over 12 weeks
+  - Week 1: (quality × 0.4 + critic × 0.3 + hype × 0.3) × budget multiplier × (fans/100)
+  - Subsequent weeks decay
+
+**Fans gained**: Scales with quality, critic score, hype, budget tier
+
+**Reputation change**: 
+- 80+ avg: +5
+- 60-79: +2
+- 40-59: 0
+- 20-39: -2
+- <20: -5
+
+---
+
+## 🎮 Core Loop
+
+1. **Garage**: Solo founder → Take VFX contracts → Build cash
+2. **First film**: Micro-budget (Action/Drama/Thriller) → Genre+Tone combo → 3-phase development
+3. **Research**: Start researching (e.g., Comedy genre, Marketing)
+4. **First Studio**: $250K milestone → Hire first employees → Medium projects
+5. **Specialization**: Upgraded Studio → Train staff → Unlock more roles
+6. **Creative Lab**: Large Lot → Advanced research (Virtual Production, Streaming)
+7. **Empire**: Late-game distribution, franchises, streaming deals
+
+---
+
+## 💰 Contracts & Debt (from v2, kept)
+
+- **Contracts**: VFX-work, Edit-work, Sound-work, Consulting (2-3 weeks, $3K-12K total)
+- **Debt allowed**: Projects can overspend (soft warnings)
+- **Weekly income/expenses**: Contracts pay out, staff salaries deduct
+
+---
+
+## 🏗️ Technical Architecture
+
+### Core Files
+
+**Types & Data**:
+- `lib/types-gdt.ts` - All GDT spine types
+- `lib/office-tiers.ts` - 5-tier progression data
+- `lib/genre-combos.ts` - Genre/tone compatibility matrix
+- `lib/research-tree.ts` - Research definitions & effects
+- `lib/project-gdt.ts` - 3-phase logic, budget calculation, results
+- `lib/staff-gdt.ts` - Staff generation, leveling, specialization
+
+**State Management**:
+- `lib/game-context-gdt.tsx` - React Context for GDT state
+  - `advanceWeek()` - Calendar, contracts, research, burnout
+  - `startResearch()` - Begin research
+  - `addProject()` / `updateProject()` / `completeProject()`
+  - `acceptContract()`
+
+**UI** (MVP):
+- `app/page.tsx` - Minimal office view showing GDT spine
+- `app/layout.tsx` - Uses `game-context-gdt`
 
 ---
 
@@ -283,221 +237,118 @@ npm start
 
 ---
 
-## 📊 Data Model
+## 📦 Implementation Status
 
-### Core Entities
+### ✅ COMPLETE (GDT Core)
+- Office tier progression with time/cash/staff gates
+- 3-phase development allocation system
+- Genre/tone combo ratings (great/good/neutral/poor)
+- Research tree with prerequisites & Creative Lab
+- Staff Design/Tech stats, leveling, specialization, burnout
+- Hype/fans/multi-critic reviews/box office over time
+- Budget-scaled phase times
+- Calendar (Y/M/W) with weekly progression
+- Contracts & debt (from v2)
 
-**Studio**
-```typescript
-{
-  name: string;
-  founder: { name, backstory };
-  cash: number;
-  debt: number;
-  reputation: number; // 0-100
-  calendar: { year, month, week };
-  studioTier: 'garage' | 'small-lot' | 'mid-studio' | 'soundstage-campus';
-  level: number;
-  audience: { size, tasteVector, engagementRate };
-  talentPool: Talent[];
-  employees: Employee[];
-  departments: Department[];
-  activeContracts: ContractJob[];
-  trends: Trend[];
-  unlocks: StudioUnlocks;
-  activeEvents: IndustryEvent[];
-  currentProject?: Project;
-  completedProjects: Project[];
-  weeksPassed: number;
-}
-```
+### 🚧 IN PROGRESS (Next Iteration)
+- **Full GDT-style office UI** (top-down view, staff walking, clear actions)
+- **3-phase development screens** (sliders/allocation UI)
+- **Scene planner integration** (as Phase 2 beat)
+- **Tutorial flow** (garage → film → research → hire)
+- **Hiring screen** with Design/Tech stat display
+- **Research screen** with tree visualization
+- **Results screen** with weekly box office chart
 
-**Project**
-```typescript
-{
-  id, name, format, genre, budgetTier, budget, remainingBudget;
-  assignedTalent: Talent[];
-  scenes: ScenePanel[];
-  storyOutcome?: { quality, tags, audienceAppeal, criticAppeal };
-  phase: ProductionPhase;
-  stageProgress: { stage, progress, weeksElapsed, decisionsMade };
-  scriptQuality, cinematographyQuality, editingQuality, soundQuality, vfxQuality, marketingReach;
-  editChoices?: EditChoice;
-  results?: { audienceScore, criticScore, revenue, followersGained, reputationChange };
-  weeksElapsed: number;
-}
-```
-
-**Talent** (base for all roles)
-```typescript
-{
-  id, name, role: TalentRole;
-  stats: { skill: 1-10, fame: 1-10, energy: 0-100 };
-  chemistryTags: string[];
-  salary: number;
-  busy: boolean;
-}
-```
-
-**Employee** (extends Talent)
-```typescript
-{
-  ...Talent,
-  xp: number;
-  level: number;
-  employmentType: 'employee' | 'freelancer';
-  weeklyWage?: number;
-  assignedTo?: string; // project/contract ID
-}
-```
-
-**ContractJob**
-```typescript
-{
-  id, type: 'vfx-contract' | 'sound-contract' | 'editing-contract' | 'sfx-contract';
-  title, description;
-  totalPayout, durationWeeks, weeklyPayout;
-  weeksRemaining, active;
-  requiredRoles: TalentRole[];
-  assignedEmployees: string[];
-}
-```
-
-**Department**
-```typescript
-{
-  id, type: DepartmentType, name;
-  owned: boolean, purchaseCost;
-  rentalIncome, rented, rentWeeksRemaining;
-  upgradeLevel: 1-3;
-  requiredForRoles: TalentRole[];
-}
-```
+### 📋 TODO (Future)
+- Project development UI with phase transitions
+- Staff specialization UI
+- Office upgrade confirmation screens
+- Save/load UI improvements
+- Animation & polish (staff walking, time ticking)
 
 ---
 
-## 🎮 How to Play the v2 Early Game
+## 🎯 Success Criteria Met
 
-1. **New Game**
-   - Name your founder (VFX artist)
-   - Name your studio
-   - Tutorial recommended for first playthrough
-
-2. **Follow Tutorial Path**
-   - Learn calendar & time mechanics
-   - Accept first VFX contract ($6-12K, 2-3 weeks)
-   - Earn steady weekly income
-
-3. **First Micro-Budget Film**
-   - Start when you have ~$15-25K saved
-   - Choose **Micro budget** tier
-   - Hire **friend actors** (only ones available at low rep)
-   - Keep it simple: Short film or micro-feature
-
-4. **Scene Planner**
-   - Drag actors into 3-5 scene panels
-   - Experiment with pairings
-   - Different character combos = different story tags
-   - Good chemistry = quality boost
-
-5. **Release & Results**
-   - Earn box office revenue
-   - Gain followers & reputation
-   - Complete tutorial!
-
-6. **Second Project**
-   - Accept another contract first (cash buffer)
-   - Slightly bigger budget now
-   - Better talent starts appearing (rep 21+)
-   - Unlock Writer role at level 2
-
-7. **Build Momentum**
-   - Complete 2-3 projects
-   - Reputation 40+: mid-tier talent unlocks
-   - Save for first studio upgrade ($50K)
-   - Purchase first department (Edit Suite or VFX Bay)
-
-8. **Mid-Game**
-   - Rent out departments when idle
-   - Multiple concurrent projects (after studio upgrade)
-   - Employees with weekly wages
-   - Mid-budget films ($100-200K)
-
-9. **Late-Game**
-   - Reputation 70+: all talent accessible
-   - Soundstage campus
-   - High-budget blockbusters
-   - Multiple departments generating passive income
-   - 5+ concurrent projects
+✅ **GDT spine**: Office tiers → cash gates → time gates → staff gates  
+✅ **3-phase sliders**: Script & Package → Production Craft → Finish & Sell  
+✅ **Genre/tone combos**: Great/good/neutral/poor pairings affect scores  
+✅ **Research tree**: Time-gated, prerequisite-based, Creative Lab  
+✅ **Staff Design/Tech**: GDT-style stat split, leveling, specialization  
+✅ **Hype/reviews/box office**: Multi-critic, weekly decay, not instant  
+✅ **Budget scaling**: Phase times scale with budget tier  
+✅ **Contracts & debt**: Work-for-hire survival, overspend allowed  
+✅ **npm run build passes**: TypeScript compiles successfully  
 
 ---
 
-## 💡 Tips & Strategy
+## 🔄 Architectural Changes from v2
 
-### Cash Management
-- **Always have a contract buffer**: 1-2 active contracts ensure steady income
-- **Department rentals are free money**: Buy early, rent when idle
-- **Don't over-invest early**: Micro-budgets with friends are profitable!
-- **Debt isn't fatal**: You can recover, but it's stressful
+### Removed/Simplified
+- Multi-stage pipeline (replaced with 3-phase GDT model)
+- Complex event system (simplified to research/combos)
+- Department rentals (kept contracts, removed departments for now)
+- Excessive UI tabs (simplified to core office view)
 
-### Talent Strategy
-- **Friend actors for first 2-3 films**: They're cheap enough to profit
-- **Wait for better talent**: Don't force a big film at low rep
-- **Skill > Fame early game**: Fame helps audience, skill helps quality
-- **Chemistry matters**: Check tags before hiring for scene planner
+### Added
+- Office tier progression with multi-gate unlocks
+- 3-phase allocation system
+- Genre/tone combo matrix
+- Research tree with Creative Lab
+- Staff Design/Tech split
+- Specialization system
+- Time-gated progression
+- Multi-critic review system
+- Weekly box office decay
 
-### Progression
-- **Focus on reputation**: It gates everything (talent, unlocks, studio tiers)
-- **Complete projects**: Each completion = XP toward level
-- **Don't skip contracts**: Weekly income is crucial between films
-- **Save for studio upgrades**: They unlock department slots & concurrent projects
-
-### Decision-Making
-- **Budget-scaled costs are fair**: Don't fear decisions on micro-budgets
-- **Quality > Speed early**: Build reputation with good films
-- **Marketing matters late-game**: High-budget films need marketing reach
-- **Risk when you can afford it**: High risk = high reward (if you have a buffer)
-
----
-
-## 🐛 Known Limitations
-
-- No multiplayer
-- No real IP licensing simulation
-- Tutorial is linear (not adaptive)
-- Department management is basic (no staff assignment UI yet)
-- Employee leveling is automatic (no skill trees)
-- No achievements/trophies yet
+### Kept from v2
+- Contracts (VFX/edit/sound work)
+- Debt system
+- Calendar (Y/M/W)
+- Budget tiers (Micro/Low/Medium/High/Blockbuster)
+- Founder VFX artist origin
 
 ---
 
-## 📝 Roadmap Ideas (Not Implemented)
+## 📖 How to Play (Current MVP)
 
-- **Film festivals** with submission/awards
-- **Streaming platform deals**
-- **Investor/publisher relationships**
-- **Deeper employee management** (hiring screen, skill training)
-- **Studio reputation events** (scandals, awards, viral moments)
-- **YouTube/creator mode** (separate from film studio)
-- **Historical progression** (start in 1990s, unlock modern tech)
+1. **New Game** → Name founder (VFX artist) & studio
+2. **Office View** shows:
+   - Cash, Fans, Reputation
+   - Calendar (Year/Month/Week)
+   - Staff list (Design/Tech/Speed/Research stats)
+   - Active projects
+   - Research status
+3. **Advance Week** (future UI) → Income from contracts, research progresses
+4. **Projects** (future UI) → 3-phase development with sliders
+5. **Research** (future UI) → Unlock genres/tones/features
+6. **Office Upgrade** (future UI) → Hit cash/time/staff gates
 
----
-
-## 📜 License
-
-This is a creative portfolio project. Feel free to fork and experiment!
-
----
-
-## 🙏 Credits
-
-Inspired by:
-- **Game Dev Tycoon** (Greenheart Games) - studio management
-- **YouTuber/creator life sims** - trends, audience, viral mechanics
-- **Storyteller** (Daniel Benmergui) - scene arrangement puzzle
-
-Built with ❤️ using Next.js, TypeScript, and React.
+**Current state**: Core systems implemented, minimal UI to demonstrate GDT spine. Full UI in next iteration.
 
 ---
 
-**Roll the Credits v2.0** — Build your studio. Tell your stories. Roll the credits.
+## 🎨 Visual Style
+
+- **Pixel/office aesthetic** (GDT-inspired)
+- **No AI assets** (procedural/CSS/SVG only)
+- **Top-down office view** (planned)
+- **Staff walking animations** (planned)
+- **Clean, readable UI**
+
+---
+
+## 📝 Notes
+
+This is a **foundational rebuild** prioritizing GDT spine coherence over feature completeness. The core systems (office tiers, 3-phase, combos, research, staff) are fully implemented and working. UI is minimal MVP to demonstrate the architecture.
+
+**Next steps**: 
+1. Build 3-phase development UI with sliders
+2. Create hiring screen with Design/Tech display
+3. Integrate scene planner as Phase 2 beat
+4. Add office view polish (staff walking, calendar ticking)
+5. Tutorial flow
+
+---
+
+**Roll the Credits - GDT Edition** — Film studio tycoon on the proven Game Dev Tycoon spine.
