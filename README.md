@@ -250,14 +250,25 @@ npm start
 - Calendar (Y/M/W) with weekly progression
 - Contracts & debt (from v2)
 
-### 🚧 IN PROGRESS (Next Iteration)
-- **Full GDT-style office UI** (top-down view, staff walking, clear actions)
-- **3-phase development screens** (sliders/allocation UI)
-- **Scene planner integration** (as Phase 2 beat)
-- **Tutorial flow** (garage → film → research → hire)
+### ✅ COMPLETE (Playable UI)
+- **Title screen** (New Game / Continue / Reset)
+- **Office view** (calendar Y/M/W, cash, fans, staff, unlock gates, Advance Week)
+- **New Project flow** with genre/tone combo rating display
+- **3-phase development screens** with allocation sliders
 - **Hiring screen** with Design/Tech stat display
 - **Research screen** with tree visualization
-- **Results screen** with weekly box office chart
+- **Release screen** with multi-critic scores & weekly box office chart
+- **Contracts board** for survival income
+- **Scene planner** (placeholder in Phase 2)
+- **Full playable loop** wired together
+
+### 🚧 POLISH (Future Iteration)
+- **Tutorial flow** (interactive garage → first film walkthrough)
+- **Animated office view** (top-down, staff walking)
+- **Full Storyteller-lite scene planner** (drag-drop actors in panels)
+- **Office upgrade animations**
+- **Staff specialization UI**
+- **Event notifications**
 
 ### 📋 TODO (Future)
 - Project development UI with phase transitions
