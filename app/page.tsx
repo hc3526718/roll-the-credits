@@ -71,6 +71,17 @@ export default function Home() {
   const [availableContracts, setAvailableContracts] = useState<Contract[]>([]);
   const [releaseResults, setReleaseResults] = useState<any>(null);
   
+  // Auto-pause/resume based on screen - MUST be before any returns
+  useEffect(() => {
+    if (!state.initialized) return; // Safe early exit inside effect
+    
+    if (screen === 'office') {
+      resumeTime(); // Resume on office screen
+    } else if (screen !== 'title') {
+      pauseTime(); // Pause on all other screens
+    }
+  }, [screen, state.initialized, resumeTime, pauseTime]);
+  
   if (!state.initialized) {
     return (
       <TitleScreen
@@ -102,15 +113,6 @@ export default function Home() {
   
   const studio = state.studio;
   const currentProject = studio.activeProjects.find(p => p.id === currentProjectId);
-  
-  // Auto-pause/resume based on screen
-  useEffect(() => {
-    if (screen === 'office') {
-      resumeTime(); // Resume on office screen
-    } else if (screen !== 'title') {
-      pauseTime(); // Pause on all other screens
-    }
-  }, [screen]);
   
   // SETTINGS
   if (screen === 'settings') {
