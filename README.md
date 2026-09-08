@@ -1,417 +1,503 @@
-# Roll the Credits v1.5
+# Roll the Credits v2.0
 
 A creative studio tycoon game that combines **Game Dev Tycoon** management, **creator sim** mechanics, and **Storyteller's** scene-planning puzzle system.
 
-## 🎮 What's New in v1.5
-
-### Multi-Stage Production Pipeline
-Gone is the simple 3-stage flow. Projects now progress through **5 realistic stages**:
-
-1. **Planning & Development** (8 weeks)
-   - Hire Writer, develop script
-   - Choose adaptation vs original story
-   - Script depth decisions
-
-2. **Pre-Production** (6 weeks)
-   - Hire Cinematographer, expand cast
-   - Location scouting vs VFX planning
-   - Schedule compression tradeoffs
-
-3. **Filming / Principal Photography** (10 weeks)
-   - Scene planner (arrange actors)
-   - On-set challenges & actor conflicts
-   - Weather delays & reshoots
-
-4. **Post-Production** (8 weeks)
-   - Hire Editor, Sound Designer, VFX Artist
-   - Choose VFX vs sound vs edit focus
-   - Picture lock decisions
-
-5. **Marketing & Distribution** (6 weeks)
-   - Campaign strategy
-   - Festival premiere vs viral vs traditional
-   - Release window optimization
-
-**Total: 38+ weeks** from greenlight to release (vs ~12 weeks in v1).
-
-### 9 Professional Roles
-Each role contributes to specific stages:
-
-- 🎭 **Actor** - Cast in scenes (multiple scenes allowed!)
-- 🎬 **Director** - Affects all stages (30% quality weight)
-- ✍️ **Writer** - Script quality in Planning (20% weight)
-- 📷 **Cinematographer** - Visual quality in Pre-production (15%)
-- ✂️ **Editor** - Pacing & flow in Post (15%)
-- 🔊 **Sound Designer** - Audio quality in Post (10%)
-- ✨ **VFX Artist** - Visual effects in Post (10%)
-- 🎵 **Composer** - Music score (optional)
-- 📋 **Producer** - Marketing reach (optional)
-
-### Studio Progression & Unlocks
-Start lean in your **garage**, earn bigger projects:
-
-**Level 1-2: Garage Studio**
-- Unlock: Actor, Director
-- Max cast: 3 actors
-- Micro/Low budgets only
-
-**Level 3-4: Small Office**
-- Unlock: Writer, Cinematographer, Editor
-- Max cast: 5 actors
-- Test screenings available
-
-**Level 5-6: Medium Studio**
-- Unlock: Sound Designer, Composer, VFX Artist
-- Max cast: 6+ actors
-- Marketing tools unlocked
-- Advanced trend insights
-
-**Level 7+: Large Studio**
-- Unlock: Producer
-- Max cast: 8+ actors
-- Festival submissions
-- All features unlocked
-
-**Office Upgrades:**
-- Garage → Small: $150,000
-- Small → Medium: $500,000
-- Medium → Large: $1,500,000
-
-### Industry Events System
-Random world events affect your projects (~5% chance per week):
-
-- **Writer Strike** (90 days) - Only non-union writers available, 1.5x cost
-- **Actor Burnout** (60 days) - Stars take sabbaticals, unavailable
-- **Union Action** (30 days) - Crew rates increase 1.2x
-- **Festival Invite** (45 days) - +5 critic score, +2 reputation
-- **Streaming War** (60 days) - Platforms compete, +10 audience
-- **Weather Delay** (14 days) - Outdoor filming delays
-- **Test Screening Leak** (7 days) - Early buzz (good or bad)
-- **Awards Buzz** (90 days) - +8 critic score, +3 reputation
-
-### Scene Planner Upgrades
-- **Actors in multiple scenes** - Your lead can appear in 3+ scenes
-- Usage count badges show how often each actor appears
-- Scene importance tracking (key / supporting / transition)
-- State preserved on back navigation
-
-### Mid-Stage Decisions
-Each stage presents **1 major decision** at 50% progress with real tradeoffs:
-
-**Decision Types:**
-- Budget vs Quality vs Time
-- Audience appeal vs Critic respect  
-- Risk levels: Low (safe), Medium (tradeoff), High (swing for fences)
-
-**Examples:**
-- "Reshoot key scene for $20K?" (+10 quality, +1 week, low risk)
-- "Replace difficult actor?" (-$50K, -10 quality, -15 audience, 4 weeks, high risk)
-- "Premium locations?" (+$40K, +12 quality, +10 critic, low risk)
-
-### Enhanced Quality System
-Overall project quality now weighted across:
-- Director contribution (30%)
-- Script quality from Writer (20%)
-- Story outcome from scene chemistry (30%)
-- Cinematography (15%)
-- Editing (15%)
-- Sound (10%)
-- VFX (10%)
-- Marketing reach bonus
-
-Plus event effects and trend bonuses.
+Build your film studio from a garage startup to a soundstage campus, managing contracts, talent, and ambitious film projects.
 
 ---
 
-## Quick Start
+## 🚀 What's New in v2.0
+
+### 🎓 Tutorial & Origin Story
+- Play as a **VFX artist** who couldn't break into the big studios
+- Interactive tutorial guides you through:
+  - Calendar & time management
+  - Contract work for survival income
+  - Your first micro-budget film with friends
+  - Scene planning mechanics
+  - Release & reputation building
+
+### 📅 Time Progression (GDT-style)
+- **Persistent calendar** (Year/Month/Week)
+- Projects consume real calendar weeks per stage
+- Idle office: advance week-by-week
+- Recurring income from contracts & department rentals
+- Plan your schedule carefully!
+
+### 💼 Contract Work Economy
+Take on **VFX, sound, editing, or SFX gigs** from other agencies:
+- Timed jobs that pay weekly (2-3 week durations)
+- Perfect for survival income between films
+- Build your reputation while keeping the lights on
+- VFX contracts leveraging your founder's background
+
+### 🏢 Studio Tier Progression
+Upgrade your studio from humble beginnings to a full campus:
+
+1. **Garage** (Starting tier)
+   - 1 concurrent project
+   - 2 department slots
+   - Your founder's VFX skills
+
+2. **Small Lot** ($50,000)
+   - 2 concurrent projects
+   - 4 department slots
+   - More professional space
+
+3. **Mid Studio** ($150,000)
+   - 3 concurrent projects
+   - 6 department slots
+   - Industry credibility
+
+4. **Soundstage Campus** ($500,000)
+   - 5 concurrent projects
+   - 10 department slots
+   - Full production empire
+
+### 🏭 Department System
+Purchase and manage departments:
+- **Editing Suite** ($15K) - Required for Editors
+- **VFX Bay** ($25K) - Required for VFX Artists
+- **Sound Stage** ($20K) - Required for Sound & Composers
+- **Marketing Office** ($10K) - Required for Producers
+- **Filming Stage** ($35K) - Required for filming
+
+**Rent them out** when idle for weekly income:
+- Editing Suite: $800/week
+- VFX Bay: $1,200/week
+- Sound Stage: $1,000/week
+- Marketing Office: $600/week
+- Filming Stage: $1,500/week
+
+### 👥 Employee System
+- Hire **permanent employees** with weekly wages
+- Employees **level up** through projects (XP system)
+- Higher levels = better skills (capped at 10)
+- Track who's busy vs available
+- Or hire **freelancers** per-project (no weekly cost)
+
+### 💰 Debt & Budget Risk
+- Projects can **go over budget**
+- Negative cash = debt tracking
+- **Soft warnings** before risky decisions
+- Recover through:
+  - Contract work
+  - Department rentals
+  - Box office hits
+- No hard blocks (except catastrophic situations)
+
+### 🎭 Talent Gating by Reputation
+Start with **friends** and unlock better talent:
+
+- **Rep 0-20**: Only friends (skill 2-4, fame 1-2)
+  - Cheap actors for micro-budget films
+  - Your initial circle
+
+- **Rep 21-40**: + Low-mid tier talent
+  - Expanding pool as word spreads
+
+- **Rep 41-70**: + Mid-high tier professionals
+  - Established industry talent
+
+- **Rep 71+**: Everyone accessible
+  - Top-tier actors & crew
+
+### 💵 Budget-Scaled Decisions
+**CRITICAL**: Event/decision costs scale with project budget tier:
+
+- **Micro budget** (~$10K film): Events cost hundreds, max ~$1K
+- **Low budget** (~$50K film): Events scaled to 35% of base
+- **Mid budget** (~$200K film): Base event costs (100%)
+- **High budget** (~$1M+ film): Events scaled to 250% of base
+
+No more "$50K shock on a $10K film" — costs always make sense!
+
+### 🖥️ Compact UI (1280×800 friendly)
+Redesigned office view:
+- **Tabbed interface** (Overview / Projects / Studio)
+- All critical info fits in viewport
+- Minimal scrolling on desktop
+- Quick actions always visible
+- Calendar, cash, debt, rep at a glance
+
+---
+
+## 🎮 Core Gameplay Loop
+
+### Early Game Path (Tutorial Recommended)
+
+1. **Name your founder & studio**
+2. **Accept your first contract** (VFX work)
+   - Earns weekly income for 2-3 weeks
+   - Builds initial cash reserve
+3. **Start micro-budget film with friends**
+   - Only friend-tier actors available (cheap but low skill)
+   - Go through 5 production stages
+   - Scene planner: arrange cast for story outcomes
+4. **Release & build reputation**
+   - Audience/critic scores
+   - Gain followers & reputation
+5. **Unlock better talent & roles**
+   - Higher rep = access to skilled professionals
+6. **Upgrade studio tier**
+   - Purchase departments
+   - Rent them out for passive income
+7. **Bigger budgets, better projects**
+   - Mid-tier films with experienced cast
+   - Complex production decisions
+8. **Build your empire**
+   - Multiple concurrent projects
+   - Full soundstage campus
+   - Top-tier talent
+
+---
+
+## 🎬 5-Stage Production Pipeline
+
+Every project goes through:
+
+### 1. Planning & Development (8 weeks)
+- Hire: **Writer, Director**
+- Script development approach
+- Source material decisions (original vs IP vs public domain)
+- **Decisions**:
+  - Deep character work vs fast draft
+  - License hot IP vs create original
+  - Script quality determines foundation
+
+### 2. Pre-Production (6 weeks)
+- Hire: **Cinematographer, Actors**
+- Production schedule planning
+- Location scouting vs VFX planning
+- **Decisions**:
+  - Practical effects vs VFX-heavy
+  - Premium locations vs compressed schedule
+  - Cinematography quality locked in
+
+### 3. Filming / Principal Photography (10 weeks)
+- **Scene Planner** (Storyteller-inspired)
+  - Arrange actors in 3-5 panels
+  - Characters can appear in multiple scenes
+  - Pairings + order = story outcomes
+- **Decisions**:
+  - On-set challenges (overtime, reshoot, move on)
+  - Actor conflicts (replace, accommodate, trust director)
+
+### 4. Post-Production (8 weeks)
+- Hire: **Editor, Sound Designer, VFX Artist**
+- Post-production focus area
+- **Decisions**:
+  - More VFX shots vs premium sound vs extra edit time
+  - Balancing quality across departments
+  - Sound, VFX, editing quality finalized
+
+### 5. Marketing & Distribution (6 weeks)
+- Marketing campaign strategy
+- **Decisions**:
+  - Festival premiere (prestige, slower)
+  - Viral campaign (social media, memes)
+  - Traditional (TV spots, press junket)
+  - Limited platform release (word-of-mouth)
+- Marketing reach determines audience multiplier
+
+**Total: 38+ weeks** from concept to release.
+
+---
+
+## 🎯 Roles & Their Impact
+
+| Role | Stage(s) | Quality Weight | Notes |
+|------|----------|---------------|-------|
+| 🎭 **Actor** | Filming | Varies | Scene chemistry & pairings matter |
+| 🎬 **Director** | All | 30% | Oversees entire production |
+| ✍️ **Writer** | Planning | 20% | Script quality foundation |
+| 📷 **Cinematographer** | Pre-prod | 15% | Visual style |
+| ✂️ **Editor** | Post | 15% | Pacing & flow |
+| 🔊 **Sound Designer** | Post | 10% | Audio immersion |
+| ✨ **VFX Artist** | Post | 10% | Visual effects |
+| 🎵 **Composer** | Post | Optional | Music score |
+| 📋 **Producer** | Marketing | Optional | Marketing reach |
+
+---
+
+## 🏆 Progression Systems
+
+### Studio Level
+Based on: `(Reputation/10 + Projects Completed + Cash/50K) / 3`
+
+- **Level 1-2**: Writer unlocks, 4 max actors
+- **Level 3-4**: Cinematographer, Editor, test screenings
+- **Level 5-6**: Sound Designer, Composer, VFX Artist, Marketing
+- **Level 7+**: Producer, festivals, 8 max actors
+
+### Unlockables
+- New roles at higher levels
+- More actor slots
+- Marketing features
+- Test screenings
+- Festival submissions
+- Advanced trend analysis
+
+### Studio Tier Bonuses
+- **Small Lot**: +1 max actors
+- **Mid Studio**: +2 max actors, +1 supporting
+- **Soundstage Campus**: +3 max actors, +2 supporting
+
+---
+
+## 🎨 Art Style
+
+**Cozy pixel/office aesthetic** inspired by Game Dev Tycoon:
+- CSS/SVG/Canvas procedural art
+- Clean, readable UI
+- Pixel borders & text styling
+- No AI-generated assets
+- Office floor visualization
+
+---
+
+## 🛠️ Tech Stack
+
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **React** (client-heavy)
+- **localStorage** for save/load persistence
+- **Tailwind CSS** + custom pixel styling
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000` to play.
+Open [http://localhost:3000](http://localhost:3000)
 
-## v1.5 Gameplay Loop
-
-### First Project (Level 1)
-1. **Office** - Start with $100K, Level 1, garage studio
-2. **Concept** - Choose Drama, Low budget ($200K)
-3. **Planning** - Hire Writer + Director (only roles available)
-4. **Pre-production** - "Unlock blocked: Need Level 3 for Cinematographer"
-   - Can still hire more Actors though!
-5. **Filming** - Scene planner: arrange 2-3 actors across scenes
-6. **Post-production** - "Unlock blocked: Need Level 3 for Editor"
-   - Project auto-advances with basic quality
-7. **Marketing** - Campaign choices (if unlocked)
-8. **Editing** - Final touch: pacing, titles, thumbnails
-9. **Results** - Scores, revenue, level up!
-
-### Second Project (Level 3+)
-Now you have Writer, Cinematographer, Editor unlocked!
-- Deeper crew at each stage
-- Better quality contributions
-- More complex decisions
-- Higher budgets available
-
-### End-Game (Level 7+)
-- Full 9-role productions
-- Festival premieres
-- Test screenings
-- Marketing campaigns
-- Streaming bidding wars
+### Build for Production
+```bash
+npm run build
+npm start
+```
 
 ---
 
-## Core Systems
+## 📊 Data Model
 
-### Scene Planner (Storyteller-Inspired)
-Before filming, arrange actors in 3-5 comic-panel scenes:
+### Core Entities
 
-- Drag actors into scenes (up to 3 per scene)
-- Actors can appear in **multiple scenes** (new in v1.5!)
-- Chemistry between paired actors affects quality:
-  - **70+ chemistry** → +5 quality, +3 audience
-  - **<30 chemistry** → -8 quality, -5 critic
-- Scene order matters (Scene 1 sets tone)
-- Chemistry tags: 'method' + 'dramatic' = good, 'method' + 'comedic' = bad
-
-**Chemistry Rules:**
-- compatible: method ↔ dramatic/intense
-- compatible: comedic ↔ quirky/romantic
-- incompatible: method ↔ comedic
-- incompatible: action-star ↔ indie-darling
-
-### Budget & Time Management
-- Each stage burns budget (~2% per week)
-- Decisions cost money and time
-- Can't proceed if over budget
-- Trends shift during production
-- Events can trigger mid-project
-
-### Progression Curve
-- **Weeks 1-10**: Learn basics (Actor/Director)
-- **Weeks 20-40**: First 2-3 projects, unlock Writer/Cinematographer/Editor
-- **Weeks 50-100**: Professional tier, Sound/VFX unlocked
-- **Weeks 100+**: Master tier, all features, high-budget prestige films
-
----
-
-## Tech Stack
-
-- **Next.js 16** (App Router)
-- **TypeScript**
-- **React 19**
-- **Tailwind CSS 4**
-- **localStorage** for save/load
-- Procedural pixel art (CSS + SVG, no AI assets)
-
----
-
-## Data Model
-
-### Studio
+**Studio**
 ```typescript
 {
-  name: string
-  cash: number
-  reputation: number (0-100)
-  level: number (1-10)
-  officeTier: 'garage' | 'small' | 'medium' | 'large'
-  
-  audience: { size, tasteVector, engagementRate }
-  talentPool: Talent[] (40 total: 12 actors, 5 directors, etc.)
-  trends: Trend[] (4 active, rotate/decay)
-  unlocks: StudioUnlocks (available roles, features)
-  activeEvents: IndustryEvent[]
-  
-  completedProjects: Project[]
-  daysPassed: number
-  weeksPassed: number
+  name: string;
+  founder: { name, backstory };
+  cash: number;
+  debt: number;
+  reputation: number; // 0-100
+  calendar: { year, month, week };
+  studioTier: 'garage' | 'small-lot' | 'mid-studio' | 'soundstage-campus';
+  level: number;
+  audience: { size, tasteVector, engagementRate };
+  talentPool: Talent[];
+  employees: Employee[];
+  departments: Department[];
+  activeContracts: ContractJob[];
+  trends: Trend[];
+  unlocks: StudioUnlocks;
+  activeEvents: IndustryEvent[];
+  currentProject?: Project;
+  completedProjects: Project[];
+  weeksPassed: number;
 }
 ```
 
-### Project
+**Project**
 ```typescript
 {
-  name, format, genre, budgetTier
-  budget, spent, remainingBudget
-  
-  assignedTalent: Talent[] (hired across all stages)
-  scenes: ScenePanel[] (3-5 panels with multi-actor support)
-  
-  phase: 'planning' | 'preproduction' | 'filming' | 'postproduction' | 'marketing' | 'released'
-  stageProgress: { stage, progress, weeksElapsed, decisionsMade }
-  allDecisionsMade: Array
-  
-  // Quality tracking
-  scriptQuality: number
-  cinematographyQuality: number
-  storyOutcome: { quality, tags, audienceAppeal, criticAppeal }
-  editingQuality: number
-  soundQuality: number
-  vfxQuality: number
-  marketingReach: number
-  
-  editChoices: { pacing, coldOpen, cutScenes, titleEnergy, thumbnailStyle }
-  results: { audienceScore, criticScore, revenue, followersGained, reputationChange }
-  
-  weeksElapsed: number
-  createdAt, releasedAt
+  id, name, format, genre, budgetTier, budget, remainingBudget;
+  assignedTalent: Talent[];
+  scenes: ScenePanel[];
+  storyOutcome?: { quality, tags, audienceAppeal, criticAppeal };
+  phase: ProductionPhase;
+  stageProgress: { stage, progress, weeksElapsed, decisionsMade };
+  scriptQuality, cinematographyQuality, editingQuality, soundQuality, vfxQuality, marketingReach;
+  editChoices?: EditChoice;
+  results?: { audienceScore, criticScore, revenue, followersGained, reputationChange };
+  weeksElapsed: number;
+}
+```
+
+**Talent** (base for all roles)
+```typescript
+{
+  id, name, role: TalentRole;
+  stats: { skill: 1-10, fame: 1-10, energy: 0-100 };
+  chemistryTags: string[];
+  salary: number;
+  busy: boolean;
+}
+```
+
+**Employee** (extends Talent)
+```typescript
+{
+  ...Talent,
+  xp: number;
+  level: number;
+  employmentType: 'employee' | 'freelancer';
+  weeklyWage?: number;
+  assignedTo?: string; // project/contract ID
+}
+```
+
+**ContractJob**
+```typescript
+{
+  id, type: 'vfx-contract' | 'sound-contract' | 'editing-contract' | 'sfx-contract';
+  title, description;
+  totalPayout, durationWeeks, weeklyPayout;
+  weeksRemaining, active;
+  requiredRoles: TalentRole[];
+  assignedEmployees: string[];
+}
+```
+
+**Department**
+```typescript
+{
+  id, type: DepartmentType, name;
+  owned: boolean, purchaseCost;
+  rentalIncome, rented, rentWeeksRemaining;
+  upgradeLevel: 1-3;
+  requiredForRoles: TalentRole[];
 }
 ```
 
 ---
 
-## Architecture
+## 🎮 How to Play the v2 Early Game
 
-```
-/lib
-  types.ts              - Core types (9 roles, 5 stages, events, unlocks)
-  game-data.ts          - Procedural generation (40 talent, trends)
-  game-logic.ts         - Calculations (quality, chemistry, results)
-  game-context.tsx      - React Context for state
-  progression.ts        - Level & unlock system
-  industry-events.ts    - Event generation & effects (8 types)
-  stage-decisions.ts    - Decision trees (5 stages, 15+ decisions)
-  procedural-art.ts     - SVG avatar generation
+1. **New Game**
+   - Name your founder (VFX artist)
+   - Name your studio
+   - Tutorial recommended for first playthrough
 
-/components
-  StartScreen.tsx
-  OfficeView.tsx        - Now shows level, events, unlocks
-  ConceptPhase.tsx
-  HiringPhase.tsx       - Stage-specific hiring with unlock gates
-  ScenePlanner.tsx      - Multi-scene actor support
-  StageScreen.tsx       - Universal stage progress component
-  DecisionModal.tsx     - Mid-stage decision overlay
-  EditingPhase.tsx
-  ResultsScreen.tsx
+2. **Follow Tutorial Path**
+   - Learn calendar & time mechanics
+   - Accept first VFX contract ($6-12K, 2-3 weeks)
+   - Earn steady weekly income
 
-/app
-  page.tsx              - Main orchestrator (5-stage pipeline)
-  layout.tsx
-  globals.css
-```
+3. **First Micro-Budget Film**
+   - Start when you have ~$15-25K saved
+   - Choose **Micro budget** tier
+   - Hire **friend actors** (only ones available at low rep)
+   - Keep it simple: Short film or micro-feature
 
----
+4. **Scene Planner**
+   - Drag actors into 3-5 scene panels
+   - Experiment with pairings
+   - Different character combos = different story tags
+   - Good chemistry = quality boost
 
-## Tips & Strategy
+5. **Release & Results**
+   - Earn box office revenue
+   - Gain followers & reputation
+   - Complete tutorial!
 
-### Early Game (Levels 1-3)
-- Focus on Micro/Low budgets
-- Build reputation with consistent quality
-- Prioritize Actor/Director chemistry in scenes
-- Save cash for Writer unlock at Level 2
+6. **Second Project**
+   - Accept another contract first (cash buffer)
+   - Slightly bigger budget now
+   - Better talent starts appearing (rep 21+)
+   - Unlock Writer role at level 2
 
-### Mid Game (Levels 4-6)
-- Unlock full crew (Cinematographer, Editor, Sound)
-- Mid-tier budgets become viable
-- Use test screenings to gauge reception
-- Balance audience vs critic scores for progression
+7. **Build Momentum**
+   - Complete 2-3 projects
+   - Reputation 40+: mid-tier talent unlocks
+   - Save for first studio upgrade ($50K)
+   - Purchase first department (Edit Suite or VFX Bay)
 
-### Late Game (Levels 7+)
-- High-budget prestige films
-- Festival premieres for critic bonuses
-- Marketing campaigns for audience reach
-- Producer helps with distribution deals
+8. **Mid-Game**
+   - Rent out departments when idle
+   - Multiple concurrent projects (after studio upgrade)
+   - Employees with weekly wages
+   - Mid-budget films ($100-200K)
 
-### Decision Strategy
-- **Low risk** when tight on budget
-- **Medium risk** for meaningful quality gains
-- **High risk** only when you can afford failure
-- Audience-focused = fast pacing + viral marketing
-- Critic-focused = slow pacing + festival premiere
-
-### Scene Planning Pro Tips
-- Check chemistry tags before pairing actors
-- Put highest-skill actor in Scene 1 (sets tone)
-- Ensemble finales (2+ actors in last scene) boost audience
-- Romantic/intense tags create story outcomes
-- Actors can repeat - use your star in 3+ scenes!
+9. **Late-Game**
+   - Reputation 70+: all talent accessible
+   - Soundstage campus
+   - High-budget blockbusters
+   - Multiple departments generating passive income
+   - 5+ concurrent projects
 
 ---
 
-## Known Behaviors
+## 💡 Tips & Strategy
+
+### Cash Management
+- **Always have a contract buffer**: 1-2 active contracts ensure steady income
+- **Department rentals are free money**: Buy early, rent when idle
+- **Don't over-invest early**: Micro-budgets with friends are profitable!
+- **Debt isn't fatal**: You can recover, but it's stressful
+
+### Talent Strategy
+- **Friend actors for first 2-3 films**: They're cheap enough to profit
+- **Wait for better talent**: Don't force a big film at low rep
+- **Skill > Fame early game**: Fame helps audience, skill helps quality
+- **Chemistry matters**: Check tags before hiring for scene planner
 
 ### Progression
-- Level calculated from: reputation/10 + projects + cash/50K
-- Unlocks check `studio.unlocks.availableRoles`
-- Locked roles show in hiring but are grayed out
+- **Focus on reputation**: It gates everything (talent, unlocks, studio tiers)
+- **Complete projects**: Each completion = XP toward level
+- **Don't skip contracts**: Weekly income is crucial between films
+- **Save for studio upgrades**: They unlock department slots & concurrent projects
 
-### Events
-- 5% chance per week during stage progression
-- Multiple events can stack
-- Effects apply to scores at release
-- Events show on Office view when active
-
-### Save/Load
-- Auto-saves after every state change (100ms debounce)
-- Stored in localStorage as JSON
-- Full state including events, unlocks, in-progress stages
-
-### Budget Discipline
-- Each stage burns ~2% budget per week
-- Decisions require remaining budget check
-- Can't proceed if over budget
-- Overspending blocks progress
+### Decision-Making
+- **Budget-scaled costs are fair**: Don't fear decisions on micro-budgets
+- **Quality > Speed early**: Build reputation with good films
+- **Marketing matters late-game**: High-budget films need marketing reach
+- **Risk when you can afford it**: High risk = high reward (if you have a buffer)
 
 ---
 
-## Changelog
+## 🐛 Known Limitations
 
-### v1.5.0 (Current)
-- ✅ 5-stage production pipeline (38+ weeks)
-- ✅ 9 professional roles with unlock progression
-- ✅ Studio levels 1-10 with office upgrades
-- ✅ Industry events system (8 event types)
-- ✅ Mid-stage decisions (15+ unique choices)
-- ✅ Actors in multiple scenes
-- ✅ Enhanced quality system (weighted crew contributions)
-- ✅ Time & calendar progression
-- ✅ Budget burn rate during stages
-- ✅ Event notification system
-- ✅ Unlock progress tracking
-
-### v1.0.0 (Launch)
-- Basic 3-stage pipeline (Hire → Scene → Production → Edit)
-- 5 roles (Actor, Director, Writer, Cinematographer, Editor)
-- Scene planner (actors in single scene only)
-- Trend system
-- Save/load
-- Pixel aesthetic
+- No multiplayer
+- No real IP licensing simulation
+- Tutorial is linear (not adaptive)
+- Department management is basic (no staff assignment UI yet)
+- Employee leveling is automatic (no skill trees)
+- No achievements/trophies yet
 
 ---
 
-## Future Roadmap
+## 📝 Roadmap Ideas (Not Implemented)
 
-**Potential v2.0 features:**
-- Multiple simultaneous projects
-- Staff management (energy, morale, contracts)
-- Studio facilities (sound stages, edit bays)
-- Marketing budget allocation
-- Real-time competing studios (AI opponents)
-- Contract negotiation minigame
-- Awards ceremonies
-- Streaming platform deals
-- International markets
+- **Film festivals** with submission/awards
+- **Streaming platform deals**
+- **Investor/publisher relationships**
+- **Deeper employee management** (hiring screen, skill training)
+- **Studio reputation events** (scandals, awards, viral moments)
+- **YouTube/creator mode** (separate from film studio)
+- **Historical progression** (start in 1990s, unlock modern tech)
 
 ---
 
-## Credits
+## 📜 License
 
-**Inspired by:**
-- **Game Dev Tycoon** (Greenheart Games) - Progression & office feel
-- **YouTuber** life sims - Audience/editing mechanics  
-- **Storyteller** (Daniel Benmergui) - Scene arrangement puzzle
-
-**Built by:** Cursor Agent + Claude Sonnet 4.5
-
-**License:** MIT
+This is a creative portfolio project. Feel free to fork and experiment!
 
 ---
 
-**Play it now!** Start your studio, unlock the industry, make your masterpiece. 🎬
+## 🙏 Credits
 
-**Live Demo:** https://roll-the-credits.vercel.app (if deployed)
+Inspired by:
+- **Game Dev Tycoon** (Greenheart Games) - studio management
+- **YouTuber/creator life sims** - trends, audience, viral mechanics
+- **Storyteller** (Daniel Benmergui) - scene arrangement puzzle
 
-**Repository:** https://github.com/hc3526718/roll-the-credits
+Built with ❤️ using Next.js, TypeScript, and React.
+
+---
+
+**Roll the Credits v2.0** — Build your studio. Tell your stories. Roll the credits.
