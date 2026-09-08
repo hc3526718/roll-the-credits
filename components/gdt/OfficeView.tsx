@@ -96,37 +96,53 @@ export default function OfficeView({
           
           {/* Projects Panel */}
           <div className="pixel-border bg-slate-800/90 p-3">
-            <h3 className="text-sm font-bold mb-2 text-purple-300 pixel-text">🎬 PROJECTS ({studio.activeProjects.length}/{tierData.maxProjects})</h3>
-            {studio.activeProjects.length === 0 ? (
-              <button
-                onClick={onNewProject}
-                disabled={studio.activeProjects.length >= tierData.maxProjects}
-                className="w-full py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-700 disabled:text-slate-500 rounded pixel-text font-bold"
-              >
-                + NEW PROJECT
-              </button>
-            ) : (
-              <div className="space-y-1 max-h-24 overflow-y-auto">
-                {studio.activeProjects.map(proj => (
-                  <button
-                    key={proj.id}
-                    onClick={() => onContinueProject(proj.id)}
-                    className="w-full text-left p-2 bg-slate-700 hover:bg-slate-600 rounded text-xs"
-                  >
-                    <p className="font-bold truncate">{proj.name}</p>
-                    <p className="text-slate-400 text-[10px]">Phase {proj.phaseState.currentPhase}</p>
-                  </button>
-                ))}
-                {studio.activeProjects.length < tierData.maxProjects && (
-                  <button
-                    onClick={onNewProject}
-                    className="w-full py-1 bg-purple-900 hover:bg-purple-800 rounded pixel-text text-xs"
-                  >
-                    + NEW
-                  </button>
-                )}
-              </div>
-            )}
+            <h3 className="text-sm font-bold mb-2 text-purple-300 pixel-text">🎬 PROJECTS</h3>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {/* Active Projects */}
+              {studio.activeProjects.length > 0 && (
+                <div>
+                  <p className="text-[10px] text-green-400 pixel-text mb-1">ACTIVE ({studio.activeProjects.length}/{tierData.maxProjects})</p>
+                  {studio.activeProjects.map(proj => (
+                    <button
+                      key={proj.id}
+                      onClick={() => onContinueProject(proj.id)}
+                      className="w-full text-left p-2 bg-green-900/30 hover:bg-green-900/50 rounded text-xs mb-1"
+                    >
+                      <p className="font-bold truncate">{proj.name}</p>
+                      <p className="text-green-300 text-[10px]">Phase {proj.phaseState.currentPhase}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Completed Projects */}
+              {studio.completedProjects.length > 0 && (
+                <div>
+                  <p className="text-[10px] text-blue-400 pixel-text mb-1">COMPLETED ({studio.completedProjects.length})</p>
+                  <div className="space-y-1">
+                    {studio.completedProjects.slice(-3).reverse().map(proj => (
+                      <div key={proj.id} className="w-full text-left p-2 bg-blue-900/20 rounded text-xs">
+                        <p className="font-bold truncate text-blue-300">{proj.name}</p>
+                        <p className="text-blue-400 text-[10px]">{proj.genre} • {proj.tone}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* New Project Button */}
+              {studio.activeProjects.length === 0 && studio.completedProjects.length === 0 && (
+                <p className="text-xs text-slate-500 text-center py-2">No projects yet</p>
+              )}
+              {studio.activeProjects.length < tierData.maxProjects && (
+                <button
+                  onClick={onNewProject}
+                  className="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded pixel-text text-xs font-bold"
+                >
+                  + NEW PROJECT
+                </button>
+              )}
+            </div>
           </div>
           
           {/* Staff & Hiring */}

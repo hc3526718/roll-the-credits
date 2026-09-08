@@ -87,15 +87,25 @@ function generatePlanningDecision(project: Project): StageDecision {
           riskLevel: 'low'
         },
         {
+          id: 'minimal-notes',
+          label: 'Writer Vision',
+          description: 'Trust the writer, minimal interference',
+          cost: 0,
+          timeWeeks: 1,
+          qualityMod: 0,
+          criticMod: 3,
+          audienceMod: -2,
+          riskLevel: 'low'
+        },
+        {
           id: 'fast-draft',
           label: 'Fast-Track Draft',
-          description: 'Minimal revisions, get to production quickly',
-          cost: 3000,
+          description: 'Quick polish, get to production',
+          cost: 500,
           timeWeeks: 1,
-          qualityMod: -5,
-          audienceMod: 5,
-          criticMod: -8,
-          riskLevel: 'medium'
+          qualityMod: -3,
+          audienceMod: 2,
+          riskLevel: 'low'
         }
       ]
     },
@@ -129,11 +139,20 @@ function generatePlanningDecision(project: Project): StageDecision {
         {
           id: 'public-domain',
           label: 'Public Domain Remix',
-          description: 'Fresh take on classic story',
-          cost: 2000,
+          description: 'Fresh take on classic story - no licensing!',
+          cost: 0,
           timeWeeks: 2,
-          qualityMod: 3,
-          riskLevel: 'medium'
+          qualityMod: 2,
+          riskLevel: 'low'
+        },
+        {
+          id: 'stick-with-script',
+          label: 'Use Current Script',
+          description: 'Work with what you have',
+          cost: 0,
+          timeWeeks: 0,
+          qualityMod: 0,
+          riskLevel: 'low'
         }
       ]
     }
@@ -172,23 +191,23 @@ function generatePreproductionDecision(project: Project): StageDecision {
         riskLevel: 'medium'
       },
       {
-        id: 'compressed',
-        label: 'Compressed Schedule',
-        description: 'Tight timeline, save money',
-        cost: 10000,
+        id: 'guerrilla-style',
+        label: 'Guerrilla Filmmaking',
+        description: 'Minimal crew, available locations, scrappy energy',
+        cost: 0,
         timeWeeks: 2,
-        qualityMod: -8,
-        riskLevel: 'high'
+        qualityMod: -5,
+        audienceMod: 2,
+        criticMod: -3,
+        riskLevel: 'low'
       },
       {
-        id: 'location-scout',
-        label: 'Premium Locations',
-        description: 'Expensive but stunning real locations',
-        cost: 40000,
-        timeWeeks: 4,
-        qualityMod: 12,
-        criticMod: 10,
-        audienceMod: 5,
+        id: 'standard-plan',
+        label: 'Standard Production Plan',
+        description: 'Straightforward approach with what you have',
+        cost: 100,
+        timeWeeks: 3,
+        qualityMod: 0,
         riskLevel: 'low'
       }
     ]
@@ -261,11 +280,11 @@ function generateFilmingDecision(project: Project): StageDecision {
         {
           id: 'director-handle',
           label: 'Let Director Handle',
-          description: 'Trust your director to manage it',
-          cost: 5000,
+          description: 'Trust your director to manage it diplomatically',
+          cost: 0,
           timeWeeks: 0,
-          qualityMod: 3,
-          riskLevel: 'medium'
+          qualityMod: 1,
+          riskLevel: 'low'
         }
       ]
     }
@@ -304,23 +323,22 @@ function generatePostproductionDecision(project: Project): StageDecision {
         riskLevel: 'low'
       },
       {
-        id: 'editor-time',
-        label: 'Extra Edit Time',
-        description: 'Perfectionist cutting room',
-        cost: 15000,
-        timeWeeks: 3,
-        qualityMod: 12,
-        criticMod: 10,
+        id: 'DIY-finish',
+        label: 'DIY Post Finish',
+        description: 'Handle it yourself with free software',
+        cost: 0,
+        timeWeeks: 2,
+        qualityMod: -5,
         audienceMod: -2,
         riskLevel: 'low'
       },
       {
-        id: 'balanced-post',
-        label: 'Balanced Finish',
-        description: 'Standard post across all departments',
-        cost: 20000,
-        timeWeeks: 2,
-        qualityMod: 5,
+        id: 'basic-polish',
+        label: 'Basic Polish',
+        description: 'Essential color/sound, nothing fancy',
+        cost: 200,
+        timeWeeks: 1,
+        qualityMod: 0,
         riskLevel: 'low'
       }
     ]
@@ -355,26 +373,24 @@ function generateMarketingDecision(project: Project): StageDecision {
         riskLevel: 'medium'
       },
       {
-        id: 'traditional',
-        label: 'Traditional Campaign',
-        description: 'TV spots, billboards, press junket',
-        cost: 40000,
+        id: 'grassroots',
+        label: 'Grassroots Campaign',
+        description: 'DIY social media, friend networks, screenings',
+        cost: 0,
         timeWeeks: 4,
-        audienceMod: 10,
-        criticMod: 3,
-        qualityMod: 5,
+        audienceMod: 3,
+        criticMod: -2,
         riskLevel: 'low'
       },
       {
-        id: 'limited-release',
-        label: 'Limited Platform Release',
-        description: 'Small rollout, build word-of-mouth',
-        cost: 15000,
-        timeWeeks: 8,
-        criticMod: 8,
-        audienceMod: 5,
-        qualityMod: 3,
-        riskLevel: 'medium'
+        id: 'minimal-marketing',
+        label: 'Minimal Marketing',
+        description: 'Poster, trailer, basic online presence',
+        cost: 150,
+        timeWeeks: 2,
+        audienceMod: 1,
+        qualityMod: -2,
+        riskLevel: 'low'
       }
     ]
   };
